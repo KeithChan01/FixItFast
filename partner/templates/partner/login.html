@@ -1,0 +1,6 @@
+{% extends 'partner/base.html' %}
+
+{% block content %}
+  {% include 'partials/login_card.html' with heading='Partner sign in' subheading='Manage your availability, quotations and jobs.' %}
+  <p class="text-center small mt-3">Not a partner yet? <a href="{% url 'partner:apply' %}">Apply to join FixItFast</a></p>
+{% endblock %}

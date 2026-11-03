@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}FixItFast Admin{% endblock %}
+
+{% block layout %}
+<div class="d-flex admin-shell">
+  <aside class="admin-sidebar p-3 no-print">
+    <a class="d-block text-white text-decoration-none brand fs-5 mb-4" href="{% url 'adminpanel:dashboard' %}">
+      FixIt<span class="accent">Fast</span> <small class="fw-normal text-secondary">Admin</small>
+    </a>
+    {% with url_name=request.resolver_match.url_name %}
+    <nav class="nav flex-column gap-1">
+      <a class="nav-link {% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'adminpanel:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+      <div class="section-label mt-3 mb-1 px-2">Queues</div>
+      <a class="nav-link {% if 'application' in url_name %}active{% endif %}" href="{% url 'adminpanel:applications' %}"><i class="bi bi-person-check me-2"></i>Applications</a>
+      <a class="nav-link {% if 'quotation' in url_name %}active{% endif %}" href="{% url 'adminpanel:quotation_queue' %}"><i class="bi bi-cash-coin me-2"></i>Quotation reviews</a>
+      <a class="nav-link {% if 'part' in url_name %}active{% endif %}" href="{% url 'adminpanel:part_queue' %}"><i class="bi bi-receipt me-2"></i>Flagged parts</a>
+      <a class="nav-link {% if 'claim' in url_name %}active{% endif %}" href="{% url 'adminpanel:claims' %}"><i class="bi bi-shield-check me-2"></i>Warranty claims</a>
+      <div class="section-label mt-3 mb-1 px-2">Records</div>
+      <a class="nav-link {% if url_name == 'jobs' or url_name == 'job_detail' %}active{% endif %}" href="{% url 'adminpanel:jobs' %}"><i class="bi bi-briefcase me-2"></i>Jobs &amp; payments</a>
+      <a class="nav-link {% if 'handym' in url_name %}active{% endif %}" href="{% url 'adminpanel:handymen' %}"><i class="bi bi-tools me-2"></i>Handymen</a>
+      <a class="nav-link {% if 'homeowner' in url_name %}active{% endif %}" href="{% url 'adminpanel:homeowners' %}"><i class="bi bi-people me-2"></i>Homeowners</a>
+      <a class="nav-link {% if 'catalogue' in url_name or 'category' in url_name or 'job_type' in url_name %}active{% endif %}" href="{% url 'adminpanel:catalogue' %}"><i class="bi bi-grid me-2"></i>Service catalogue</a>
+    </nav>
+    {% endwith %}
+  </aside>
+
+  <div class="flex-grow-1 d-flex flex-column">
+    <header class="bg-white border-bottom px-4 py-2 d-flex justify-content-end align-items-center gap-3 no-print">
+      <a class="text-secondary" href="{% url 'adminpanel:notifications' %}" aria-label="Notifications"><i class="bi bi-bell"></i>
+        {% if unread_notifications %}<span class="badge rounded-pill bg-danger">{{ unread_notifications }}</span>{% endif %}</a>
+      <span class="small text-secondary">{{ user.get_full_name|default:user.email }} &middot; {{ user.get_role_display }}</span>
+      <form method="post" action="{% url 'adminpanel:logout' %}">
+        {% csrf_token %}
+        <button class="btn btn-outline-secondary btn-sm" type="submit">Sign out</button>
+      </form>
+    </header>
+    <main class="p-4">
+      {% include 'partials/messages.html' %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}

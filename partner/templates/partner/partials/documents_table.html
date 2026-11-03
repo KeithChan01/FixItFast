@@ -1,0 +1,16 @@
+{% load fixitfast %}
+<table class="table table-sm small align-middle mb-0">
+  <thead><tr><th>Document</th><th>Expires</th><th>Status</th></tr></thead>
+  <tbody>
+    {% for doc in documents %}
+      <tr>
+        <td>{{ doc.get_doc_type_display }}<div class="text-secondary">{{ doc.title }}</div></td>
+        <td>{{ doc.expiry_date|date:"j M Y"|default:"–" }}</td>
+        <td>{% status_badge doc.status doc.get_status_display %}
+          {% if doc.rejection_reason %}<div class="text-danger">{{ doc.rejection_reason }}</div>{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3" class="text-secondary">No documents uploaded.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -1,0 +1,29 @@
+{% extends 'partner/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h4 mb-0">My jobs</h1>
+  <div class="btn-group btn-group-sm">
+    <a class="btn btn-outline-primary {% if status == 'open' %}active{% endif %}" href="?status=open">Open</a>
+    <a class="btn btn-outline-primary {% if status == 'closed' %}active{% endif %}" href="?status=closed">Closed</a>
+    <a class="btn btn-outline-primary {% if status == 'all' %}active{% endif %}" href="?status=all">All</a>
+  </div>
+</div>
+<div class="table-responsive card border-0 shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Job</th><th>Slot</th><th>Tier</th><th>Range</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for job in jobs %}
+        <tr>
+          <td><a href="{% url 'partner:job_detail' job.pk %}">#{{ job.pk }} · {{ job.job_type }}</a></td>
+          <td class="small">{{ job.slot_start|date:"D j M, g:i A" }}</td>
+          <td>{% tier_badge job.tier %}</td>
+          <td class="small">{{ job.price_p10|whole_money }}–{{ job.price_p90|whole_money }}</td>
+          <td>{% status_badge job.status job.get_status_display %}</td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-secondary">No jobs.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

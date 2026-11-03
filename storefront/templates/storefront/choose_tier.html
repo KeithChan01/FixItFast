@@ -1,0 +1,26 @@
+{% extends 'storefront/base.html' %}
+{% block title %}Choose a tier · FixItFast{% endblock %}
+
+{% block content %}
+{% include 'storefront/partials/booking_steps.html' with step=2 %}
+<h1 class="h4 mb-1">Choose your service tier</h1>
+<p class="text-secondary mb-4">
+  For <strong>{{ job.job_type }}</strong>, these tiers are available. You will see prices for each slot on the next page.
+</p>
+<form method="post">
+  {% csrf_token %}
+  <div class="row g-3">
+    {% for tier, label, info in tiers %}
+      <div class="col-md-4">
+        <button type="submit" name="tier" value="{{ tier }}"
+                class="card tier-option h-100 w-100 text-start border bg-white p-0">
+          <div class="card-body w-100 d-flex flex-column">
+            {% include 'storefront/partials/tier_card.html' %}
+            <div class="mt-auto pt-3"><span class="btn btn-outline-primary btn-sm">Choose {{ label }}</span></div>
+          </div>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+</form>
+{% endblock %}

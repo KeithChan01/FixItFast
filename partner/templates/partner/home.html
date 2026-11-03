@@ -1,0 +1,46 @@
+{% extends 'partner/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<h1 class="h4 mb-3">Hello, {{ user.first_name }}</h1>
+{% if profile.is_suspended %}<div class="alert alert-danger">Your account is suspended: {{ profile.suspension_reason }}</div>{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card stat-card border-0 shadow-sm"><div class="card-body"><div class="small text-secondary">Tier</div><div class="value">{{ profile.get_tier_display }}</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card border-0 shadow-sm"><div class="card-body"><div class="small text-secondary">Rating</div><div class="value">{{ rating|default:"–" }}</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card border-0 shadow-sm"><div class="card-body"><div class="small text-secondary">Completed jobs</div><div class="value">{{ completed }}</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card border-0 shadow-sm"><div class="card-body"><div class="small text-secondary">Paid out this month</div><div class="value">{{ month_payouts|money }}</div></div></div></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <h2 class="h6 fw-semibold">New requests – quote needed</h2>
+    <div class="list-group shadow-sm mb-4">
+      {% for job in requests %}
+        <a class="list-group-item list-group-item-action" href="{% url 'partner:job_detail' job.pk %}">
+          <div class="d-flex justify-content-between"><strong>#{{ job.pk }} · {{ job.job_type }}</strong>{% status_badge job.status job.get_status_display %}</div>
+          <div class="small text-secondary">{{ job.slot_start|date:"D j M, g:i A" }} · {{ job.planning_region }} · quote by {{ job.quote_deadline|date:"g:i A" }}</div>
+        </a>
+      {% empty %}<div class="list-group-item small text-secondary">No new requests.</div>{% endfor %}
+    </div>
+    <h2 class="h6 fw-semibold">Waiting on homeowner or review</h2>
+    <div class="list-group shadow-sm">
+      {% for job in awaiting %}
+        <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{% url 'partner:job_detail' job.pk %}">
+          <span>#{{ job.pk }} · {{ job.job_type }}</span>{% status_badge job.status job.get_status_display %}</a>
+      {% empty %}<div class="list-group-item small text-secondary">Nothing waiting.</div>{% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <h2 class="h6 fw-semibold">Upcoming visits</h2>
+    <div class="list-group shadow-sm">
+      {% for job in upcoming %}
+        <a class="list-group-item list-group-item-action" href="{% url 'partner:job_detail' job.pk %}">
+          <div class="d-flex justify-content-between"><strong>{{ job.slot_start|date:"D j M, g:i A" }}</strong>{% status_badge job.status job.get_status_display %}</div>
+          <div class="small text-secondary">#{{ job.pk }} · {{ job.job_type }}</div>
+        </a>
+      {% empty %}<div class="list-group-item small text-secondary">No upcoming visits.</div>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

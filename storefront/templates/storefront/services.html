@@ -1,0 +1,35 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}Services · FixItFast{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2">
+  <div>
+    <h1 class="h4 mb-1">Services</h1>
+    <p class="text-secondary mb-0">Prices depend on your tier and appointment time, so you will see them on the slot calendar.</p>
+  </div>
+  <a class="btn btn-outline-primary btn-sm" href="{% url 'storefront:tiers' %}">What do the tiers mean?</a>
+</div>
+
+{% for category in categories %}
+  <h2 class="h5 mt-4 mb-3">{{ category.name }}</h2>
+  <div class="row g-3">
+    {% for job_type in category.job_types.all %}{% if job_type.is_active %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h3 class="h6 fw-semibold">{{ job_type.name }}</h3>
+            {% if job_type.description %}<p class="small text-secondary">{{ job_type.description }}</p>{% endif %}
+            <div class="small mb-3">
+              Available tiers:
+              {% for tier in job_type.allowed_tiers %}{% tier_badge tier %} {% endfor %}
+              {% if job_type.licence_required %}<div class="text-secondary mt-1"><i class="bi bi-patch-check"></i> Licensed handymen only</div>{% endif %}
+            </div>
+            <a class="btn btn-sm btn-primary mt-auto align-self-start" href="{% url 'storefront:job_request' %}?job_type={{ job_type.pk }}">Book this repair</a>
+          </div>
+        </div>
+      </div>
+    {% endif %}{% endfor %}
+  </div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}My jobs · FixItFast{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">My jobs</h1>
+  <a class="btn btn-primary btn-sm" href="{% url 'storefront:job_request' %}">Book a repair</a>
+</div>
+
+<h2 class="h6 text-secondary text-uppercase small mt-4">In progress</h2>
+<div class="list-group shadow-sm mb-4">
+  {% for job in active %}
+    <a href="{% url 'storefront:job_detail' job.pk %}" class="list-group-item list-group-item-action d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <div class="fw-semibold">#{{ job.pk }} · {{ job.job_type }} {% tier_badge job.tier %}</div>
+        <div class="small text-secondary">
+          {% if job.slot_start %}{{ job.slot_start|date:"D j M, g:i A" }}{% else %}No slot chosen yet{% endif %}
+          {% if job.handyman %} · {{ job.handyman.user.get_full_name }}{% endif %}
+        </div>
+      </div>
+      {% status_badge job.status job.get_status_display %}
+    </a>
+  {% empty %}
+    <div class="list-group-item text-secondary small">No open jobs.</div>
+  {% endfor %}
+</div>
+
+<h2 class="h6 text-secondary text-uppercase small">History</h2>
+<div class="list-group shadow-sm">
+  {% for job in past %}
+    <div class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <a class="fw-semibold" href="{% url 'storefront:job_detail' job.pk %}">#{{ job.pk }} · {{ job.job_type }}</a> {% tier_badge job.tier %}
+        <div class="small text-secondary">{{ job.slot_start|date:"j M Y" }}{% if job.warranty_active %} · Warranty until {{ job.warranty_ends_at|date:"j M Y" }}{% endif %}</div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        {% status_badge job.status job.get_status_display %}
+        {% if job.is_paid %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'storefront:receipt' job.pk %}">Receipt</a>{% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="list-group-item text-secondary small">No past jobs yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+:root {
+  --bs-primary: #0f766e;
+  --bs-primary-rgb: 15, 118, 110;
+  --bs-link-color: #0f766e;
+  --bs-link-hover-color: #115e59;
+  --ff-accent: #f59e0b;
+  --ff-sidebar: #0f172a;
+}
+
+body {
+  background: #f8fafc;
+}
+
+.btn-primary {
+  --bs-btn-bg: #0f766e;
+  --bs-btn-border-color: #0f766e;
+  --bs-btn-hover-bg: #115e59;
+  --bs-btn-hover-border-color: #115e59;
+  --bs-btn-active-bg: #134e4a;
+  --bs-btn-active-border-color: #134e4a;
+  --bs-btn-disabled-bg: #0f766e;
+  --bs-btn-disabled-border-color: #0f766e;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #0f766e;
+  --bs-btn-border-color: #0f766e;
+  --bs-btn-hover-bg: #0f766e;
+  --bs-btn-hover-border-color: #0f766e;
+  --bs-btn-active-bg: #115e59;
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.brand .accent { color: var(--ff-accent); }
+
+/* Django form widgets render without classes; style them like Bootstrap controls. */
+form input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=submit]),
+form select,
+form textarea {
+  display: block;
+  width: 100%;
+  padding: .375rem .75rem;
+  border: 1px solid #dee2e6;
+  border-radius: .375rem;
+  background: #fff;
+}
+form input:focus, form select:focus, form textarea:focus {
+  outline: 0;
+  border-color: #5eead4;
+  box-shadow: 0 0 0 .2rem rgba(15, 118, 110, .2);
+}
+form input[type=checkbox] { margin-right: .35rem; }
+
+/* Storefront */
+.hero {
+  background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+  color: #fff;
+  border-radius: 1rem;
+}
+
+/* Tier badges, used across all three sections */
+.badge-tier-STANDARD { background: #64748b; }
+.badge-tier-GOLD { background: #d97706; }
+.badge-tier-PLATINUM { background: #334155; border: 1px solid #94a3b8; }
+
+/* Admin panel layout: fixed sidebar on wide screens, stacked on narrow ones */
+.admin-shell { min-height: 100vh; }
+.admin-sidebar {
+  background: var(--ff-sidebar);
+  width: 240px;
+  flex-shrink: 0;
+}
+.admin-sidebar .nav-link {
+  color: #cbd5e1;
+  border-radius: .375rem;
+  padding: .45rem .75rem;
+}
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+  color: #fff;
+  background: rgba(255, 255, 255, .08);
+}
+.admin-sidebar .section-label {
+  color: #64748b;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+@media (max-width: 767.98px) {
+  .admin-shell { flex-direction: column; }
+  .admin-sidebar { width: 100%; }
+}
+
+.stat-card .value { font-size: 1.75rem; font-weight: 600; }
+
+@media print {
+  .no-print, nav, .admin-sidebar { display: none !important; }
+  body { background: #fff; }
+}
+
+.step-num {
+  width: 2.5rem; height: 2.5rem; line-height: 2.5rem; margin: 0 auto;
+  border-radius: 50%; background: #ccfbf1; color: #0f766e; font-weight: 700;
+}
+
+/* Booking progress bar (H03-H07) */
+.booking-steps { display: flex; gap: .5rem; flex-wrap: wrap; font-size: .85rem; }
+.booking-steps span { padding: .25rem .75rem; border-radius: 999px; background: #e2e8f0; color: #475569; }
+.booking-steps span.done { background: #ccfbf1; color: #0f766e; }
+.booking-steps span.current { background: #0f766e; color: #fff; }
+
+/* Tier choice cards (H04) */
+.tier-option { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.tier-option:hover { border-color: #0f766e !important; box-shadow: 0 .25rem 1rem rgba(15, 118, 110, .15); }
+
+/* Slot calendar (H05) */
+.slot-btn { text-align: left; min-width: 10.5rem; }
+.slot-btn .range { font-weight: 600; }
+.band-Peak { border-left: 4px solid var(--ff-accent) !important; }
+.band-Off-peak { border-left: 4px solid #0f766e !important; }
+
+/* Timeline (H08) */
+.timeline { list-style: none; padding-left: 1rem; border-left: 2px solid #cbd5e1; }
+.timeline li { position: relative; padding: 0 0 1rem .75rem; }
+.timeline li::before {
+  content: ''; position: absolute; left: -1.45rem; top: .35rem;
+  width: .75rem; height: .75rem; border-radius: 50%; background: #0f766e;
+}
+.photo-thumb { width: 96px; height: 96px; object-fit: cover; border-radius: .5rem; }
+.avatar { width: 72px; height: 72px; object-fit: cover; border-radius: 50%; background: #e2e8f0; }

@@ -1,0 +1,106 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}Job #{{ job.pk }} · FixItFast{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+  <div>
+    <a class="small" href="{% url 'storefront:jobs' %}">&larr; My jobs</a>
+    <h1 class="h4 mb-1">#{{ job.pk }} · {{ job.job_type }}</h1>
+    <div>{% status_badge job.status job.get_status_display %} {% tier_badge job.tier %}</div>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    {% if continue_booking %}<a class="btn btn-primary" href="{% if job.status == 'AWAITING_PAYMENT' %}{% url 'storefront:quotation' job.pk %}{% elif job.status == 'REQUESTED' %}{% url 'storefront:recommendation' job.pk %}{% elif job.tier %}{% url 'storefront:choose_slot' job.pk %}{% else %}{% url 'storefront:choose_tier' job.pk %}{% endif %}">{% if job.status == 'AWAITING_PAYMENT' %}Review quotation and pay{% else %}Continue booking{% endif %}</a>{% endif %}
+    {% if job.status == 'COMPLETED' and not job.review %}<a class="btn btn-primary" href="{% url 'storefront:confirm_job' job.pk %}">{% if job.confirmed_at %}Rate your handyman{% else %}Confirm and rate{% endif %}</a>{% endif %}
+    {% if can_claim %}<a class="btn btn-outline-warning" href="{% url 'storefront:raise_claim' job.pk %}"><i class="bi bi-shield-exclamation"></i> Raise warranty claim</a>{% endif %}
+    {% if job.is_paid %}<a class="btn btn-outline-secondary" href="{% url 'storefront:receipt' job.pk %}">Receipt</a>{% endif %}
+    {% if job.can_cancel or job.status == 'DRAFT' %}<a class="btn btn-outline-danger" href="{% url 'storefront:cancel_job' job.pk %}">Cancel</a>{% endif %}
+  </div>
+</div>
+
+{% for part in pending_parts %}
+  <div class="alert alert-warning d-flex justify-content-between align-items-center">
+    <span>Your handyman added <strong>{{ part.name }}</strong> ({{ part.price|money }}). Please approve or decline.</span>
+    <a class="btn btn-sm btn-warning" href="{% url 'storefront:part_decision' part.pk %}">Review part</a>
+  </div>
+{% endfor %}
+{% if job.status == 'QUOTE_REVIEW' %}
+  <div class="alert alert-info">The handyman's quotation is being checked by FixItFast staff. We'll notify you when it is ready.</div>
+{% elif job.status == 'ASSIGNED' or job.status == 'QUOTE_PENDING' %}
+  <div class="alert alert-info">Waiting for {{ job.handyman.user.get_full_name }} to send a quotation (by {{ job.quote_deadline|date:"g:i A, j M" }}).</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Details</h2>
+      <dl class="row small mb-0">
+        <dt class="col-sm-4">Appointment</dt>
+        <dd class="col-sm-8">{% if job.slot_start %}{{ job.slot_start|date:"D j M Y, g:i A" }} – {{ job.slot_end|time:"g:i A" }} ({{ job.timing_band }}){% else %}Not chosen{% endif %}</dd>
+        <dt class="col-sm-4">Address</dt><dd class="col-sm-8">{{ job.address }}</dd>
+        <dt class="col-sm-4">Handyman</dt><dd class="col-sm-8">{{ job.handyman.user.get_full_name|default:"Not assigned yet" }}</dd>
+        {% if job.price_p10 %}<dt class="col-sm-4">Predicted range</dt><dd class="col-sm-8">{{ job.price_p10|whole_money }} – {{ job.price_p90|whole_money }}</dd>{% endif %}
+        {% if quote %}<dt class="col-sm-4">Quotation</dt><dd class="col-sm-8">{{ quote.amount|money }} – {{ quote.work_description }}</dd>{% endif %}
+        {% if job.warranty_ends_at %}<dt class="col-sm-4">Warranty</dt><dd class="col-sm-8">Until {{ job.warranty_ends_at|date:"j M Y" }}</dd>{% endif %}
+        <dt class="col-sm-4">Description</dt><dd class="col-sm-8">{{ job.description|linebreaksbr }}</dd>
+      </dl>
+      {% if photos %}
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          {% for photo in photos %}<a href="{{ photo.image.url }}" target="_blank" title="{{ photo.get_kind_display }}"><img class="photo-thumb" src="{{ photo.image.url }}" alt="{{ photo.get_kind_display }}"></a>{% endfor %}
+        </div>
+      {% endif %}
+    </div></div>
+
+    {% if parts %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Added parts</h2>
+      <table class="table table-sm small mb-0">
+        {% for part in parts %}
+          <tr><td>{{ part.name }}</td><td>{{ part.price|money }}</td><td>{% status_badge part.homeowner_decision part.get_homeowner_decision_display %}</td></tr>
+        {% endfor %}
+      </table>
+    </div></div>
+    {% endif %}
+
+    {% if claims %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Warranty claims</h2>
+      {% for claim in claims %}
+        <div class="border-bottom py-2 small">
+          {% status_badge claim.status claim.get_status_display %} <span class="text-secondary">{{ claim.created_at|date:"j M Y" }}</span>
+          <div>{{ claim.description }}</div>
+          {% if claim.return_visit_at %}<div>Return visit: {{ claim.return_visit_at|date:"D j M, g:i A" }}{% if claim.replacement_handyman %} with {{ claim.replacement_handyman.user.get_full_name }}{% endif %}</div>{% endif %}
+          {% if claim.refund_amount %}<div>Refunded {{ claim.refund_amount|money }}</div>{% endif %}
+          {% if claim.resolution_note %}<div class="text-secondary">{{ claim.resolution_note }}</div>{% endif %}
+        </div>
+      {% endfor %}
+    </div></div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold mb-3">Timeline</h2>
+      <ul class="timeline small mb-0">
+        {% for event in events %}
+          <li><strong>{{ event.get_status_display }}</strong> <span class="text-secondary">{{ event.created_at|date:"j M, g:i A" }}</span>
+            {% if event.note %}<div class="text-secondary">{{ event.note }}</div>{% endif %}</li>
+        {% endfor %}
+      </ul>
+      <p class="small text-secondary mt-2 mb-0">Refresh the page for the latest updates.</p>
+    </div></div>
+
+    {% if job.is_paid %}
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Payment</h2>
+      <table class="table table-sm small mb-0">
+        <tr><td>Paid in</td><td class="text-end">{{ summary.paid_in|money }}</td></tr>
+        {% if summary.refunds %}<tr><td>Refunded</td><td class="text-end">−{{ summary.refunds|money }}</td></tr>{% endif %}
+        {% if summary.consultation_fee %}<tr><td>Consultation fee</td><td class="text-end">{{ summary.consultation_fee|money }}</td></tr>{% endif %}
+        <tr class="fw-semibold"><td>Net paid</td><td class="text-end">{{ summary.net_paid|money }}</td></tr>
+      </table>
+    </div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

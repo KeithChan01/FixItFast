@@ -1,0 +1,37 @@
+{% extends 'partner/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<h1 class="h4 mb-3">Profile {% tier_badge handyman.tier %}</h1>
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Profile and job types</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=profile_form %}
+        {% if locked_job_types %}
+          <p class="small text-secondary">Locked until a higher tier or a verified licence:
+            {% for jt in locked_job_types %}{{ jt.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+        {% endif %}
+        <button class="btn btn-primary" name="save_profile" type="submit">Save profile</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">My documents</h2>
+      {% include 'partner/partials/documents_table.html' %}
+    </div></div>
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Upload a document</h2>
+      <p class="small text-secondary">New certificates, licences and insurance go to FixItFast for verification.</p>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=document_form %}
+        <button class="btn btn-outline-primary" name="upload_document" type="submit">Upload</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

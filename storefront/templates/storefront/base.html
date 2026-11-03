@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand brand" href="{% url 'storefront:home' %}">FixIt<span class="accent">Fast</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#storeNav"
+            aria-controls="storeNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="storeNav">
+      {% with url_name=request.resolver_match.url_name %}
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link {% if url_name == 'services' %}active{% endif %}" href="{% url 'storefront:services' %}">Services</a></li>
+        <li class="nav-item"><a class="nav-link {% if url_name == 'tiers' %}active{% endif %}" href="{% url 'storefront:tiers' %}">Compare tiers</a></li>
+        {% if user.is_authenticated and user.role == 'HOMEOWNER' %}
+          <li class="nav-item"><a class="nav-link {% if url_name == 'jobs' or url_name == 'job_detail' %}active{% endif %}" href="{% url 'storefront:jobs' %}">My jobs</a></li>
+        {% endif %}
+      </ul>
+      {% endwith %}
+      <ul class="navbar-nav align-items-lg-center">
+        {% if user.is_authenticated and user.role == 'HOMEOWNER' %}
+          <li class="nav-item">
+            <a class="nav-link position-relative" href="{% url 'storefront:notifications' %}" aria-label="Notifications">
+              <i class="bi bi-bell"></i>
+              {% if unread_notifications %}
+                <span class="badge rounded-pill bg-danger">{{ unread_notifications }}</span>
+              {% endif %}
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ user.first_name|default:user.email }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'storefront:account' %}">My account</a></li>
+              <li><a class="dropdown-item" href="{% url 'storefront:jobs' %}">My jobs</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="{% url 'storefront:logout' %}">
+                  {% csrf_token %}
+                  <button class="dropdown-item" type="submit">Sign out</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'storefront:login' %}">Sign in</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'storefront:register' %}">Register</a></li>
+        {% endif %}
+        <li class="nav-item ms-lg-2"><a class="btn btn-primary btn-sm" href="{% url 'storefront:job_request' %}">Book a repair</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block footer %}
+<footer class="border-top bg-white py-4 mt-5 no-print">
+  <div class="container d-flex flex-wrap justify-content-between small text-secondary gap-2">
+    <span>&copy; FixItFast</span>
+    <span>
+      <a href="{% url 'partner:login' %}" class="text-secondary">Handyman partners</a>
+      &middot;
+      <a href="{% url 'adminpanel:login' %}" class="text-secondary">Staff</a>
+    </span>
+  </div>
+</footer>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'adminpanel:part_queue' %}">&larr; Flagged parts</a>
+<h1 class="h4 mb-3">{{ part.name }} · job #{{ job.pk }}</h1>
+<div class="row g-4">
+  <div class="col-lg-5">
+    <a href="{{ part.receipt.url }}" target="_blank"><img class="img-fluid rounded border shadow-sm" src="{{ part.receipt.url }}" alt="Receipt"></a>
+  </div>
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <table class="table table-sm">
+        <tr><td>Part price</td><td class="text-end fw-semibold">{{ part.price|money }}</td></tr>
+        <tr><td>Original quotation</td><td class="text-end">{{ quote.amount|money }}</td></tr>
+        <tr><td>Job total incl. approved parts</td><td class="text-end">{{ job_total|money }}</td></tr>
+        <tr><td>Predicted range ({{ job.get_tier_display }}, {{ job.timing_band }})</td><td class="text-end">{{ job.price_p10|whole_money }} – {{ job.price_p90|whole_money }}</td></tr>
+        <tr><td>Status</td><td class="text-end">{% status_badge part.review_status part.get_review_status_display %}</td></tr>
+      </table>
+      {% if part.review_status == 'PENDING' %}
+        <form method="post" class="mb-3">{% csrf_token %}
+          <button class="btn btn-success" name="action" value="approve">Approve receipt – release payout</button></form>
+        <form method="post">{% csrf_token %}
+          {% include 'partials/form_fields.html' with form=form %}
+          <button class="btn btn-outline-danger" name="action" value="reject">Reject – refund homeowner</button></form>
+      {% else %}
+        <p class="small mb-0">Reviewed by {{ part.reviewed_by }} on {{ part.reviewed_at|date:"j M Y, g:i A" }}. {{ part.review_reason }}</p>
+      {% endif %}
+    </div></div>
+  </div>
+</div>
+{% endblock %}

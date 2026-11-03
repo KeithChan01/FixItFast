@@ -1,0 +1,37 @@
+{% extends 'storefront/base.html' %}
+
+{% block content %}
+<section class="hero p-4 p-md-5 mb-5">
+  <h1 class="display-6 fw-semibold">Home repairs, priced before you book.</h1>
+  <p class="lead mb-4">Describe the problem once, choose your handyman tier, and see a price range beside every slot.</p>
+  <a href="{% url 'storefront:job_request' %}" class="btn btn-light btn-lg">Book a repair</a>
+  <a href="{% url 'storefront:tiers' %}" class="btn btn-outline-light btn-lg ms-2">Compare tiers</a>
+</section>
+
+<div class="row g-3 mb-5 text-center">
+  <div class="col-md-3"><div class="step-num">1</div><h3 class="h6 mt-2">Describe it once</h3><p class="small text-secondary">Pick the repair, add photos and your address.</p></div>
+  <div class="col-md-3"><div class="step-num">2</div><h3 class="h6 mt-2">Choose a tier</h3><p class="small text-secondary">Standard, Gold or Platinum, each with its own warranty.</p></div>
+  <div class="col-md-3"><div class="step-num">3</div><h3 class="h6 mt-2">Compare slot prices</h3><p class="small text-secondary">Every slot shows a price range predicted from past jobs.</p></div>
+  <div class="col-md-3"><div class="step-num">4</div><h3 class="h6 mt-2">Pay safely</h3><p class="small text-secondary">We hold your payment until the job is done.</p></div>
+</div>
+
+<h2 class="h4 mb-3">What we fix</h2>
+<div class="row g-3">
+  {% for category in categories %}
+    <div class="col-sm-6 col-lg-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <h3 class="h6 fw-semibold">{{ category.name }}</h3>
+          <ul class="list-unstyled small text-secondary mb-0">
+            {% for job_type in category.job_types.all %}
+              {% if job_type.is_active %}<li><a class="link-secondary" href="{% url 'storefront:job_request' %}?job_type={{ job_type.pk }}">{{ job_type.name }}</a></li>{% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-secondary">No services yet. Run <code>python manage.py seed_demo</code>.</p>
+  {% endfor %}
+</div>
+{% endblock %}

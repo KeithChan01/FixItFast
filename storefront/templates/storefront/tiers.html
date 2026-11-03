@@ -1,0 +1,17 @@
+{% extends 'storefront/base.html' %}
+{% block title %}Compare tiers · FixItFast{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-1">Compare service tiers</h1>
+<p class="text-secondary mb-4">Higher tiers bring more experienced handymen and longer protection. Prices are shown per slot when you book.</p>
+<div class="row g-3">
+  {% for tier, label, info in tiers %}
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+        {% include 'storefront/partials/tier_card.html' %}
+      </div></div>
+    </div>
+  {% endfor %}
+</div>
+<p class="small text-secondary mt-4 mb-0">Licences for electrical and gas work are required at every tier. Handymen can move down a tier if they stop meeting its requirements.</p>
+{% endblock %}

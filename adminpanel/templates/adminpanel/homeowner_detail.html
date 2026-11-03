@@ -1,0 +1,49 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'adminpanel:homeowners' %}">&larr; Homeowners</a>
+<h1 class="h4 mb-1">{{ homeowner.get_full_name }}</h1>
+<p class="small text-secondary">{{ homeowner.email }} · {{ homeowner.mobile }} · joined {{ homeowner.date_joined|date:"j M Y" }} · total paid {{ total_paid|money }}</p>
+{% if homeowner.is_deactivated %}<div class="alert alert-danger">Deactivated: {{ homeowner.deactivation_reason }}</div>{% endif %}
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Jobs</h2>
+      <table class="table table-sm small mb-0">
+        <thead><tr><th>Job</th><th>Slot</th><th>Tier</th><th>Status</th></tr></thead>
+        {% for job in jobs %}<tr><td><a href="{% url 'adminpanel:job_detail' job.pk %}">#{{ job.pk }} · {{ job.job_type }}</a></td><td>{{ job.slot_start|date:"j M Y, g:i A"|default:"–" }}</td><td>{% tier_badge job.tier %}</td><td>{% status_badge job.status job.get_status_display %}</td></tr>
+        {% empty %}<tr><td colspan="4" class="text-secondary">No jobs.</td></tr>{% endfor %}
+      </table>
+    </div></div>
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Warranty claims</h2>
+      <table class="table table-sm small mb-0">
+        {% for c in claims %}<tr><td><a href="{% url 'adminpanel:claim_detail' c.pk %}">Job #{{ c.job.pk }} · {{ c.job.job_type }}</a></td><td>{{ c.created_at|date:"j M Y" }}</td><td>{% status_badge c.status c.get_status_display %}</td></tr>
+        {% empty %}<tr><td class="text-secondary">No claims.</td></tr>{% endfor %}
+      </table>
+    </div></div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Addresses</h2>
+      {% for a in addresses %}<div class="small border-bottom py-1"><strong>{{ a.label }}</strong> · {{ a }} <span class="text-secondary">({{ a.planning_region }})</span></div>
+      {% empty %}<p class="small text-secondary mb-0">None.</p>{% endfor %}
+    </div></div>
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Account</h2>
+      <form method="post">
+        {% csrf_token %}
+        {% if homeowner.is_deactivated %}
+          <button class="btn btn-outline-success" name="action" value="reactivate">Reactivate account</button>
+        {% else %}
+          {% include 'partials/form_fields.html' with form=form %}
+          <button class="btn btn-outline-danger" name="action" value="deactivate">Deactivate account</button>
+          <div class="form-text">A deactivated homeowner cannot book, but their records are kept.</div>
+        {% endif %}
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

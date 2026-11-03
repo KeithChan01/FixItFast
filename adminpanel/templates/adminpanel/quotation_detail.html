@@ -1,0 +1,54 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'adminpanel:quotation_queue' %}">&larr; Quotation reviews</a>
+<h1 class="h4 mb-1">Quotation for job #{{ job.pk }}</h1>
+<p class="small text-secondary">{{ job.job_type }} · {% tier_badge job.tier %} · {{ job.timing_band }} · {{ job.planning_region }} · {{ job.slot_start|date:"D j M, g:i A" }} · {% status_badge quote.status quote.get_status_display %}</p>
+
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Price check <span class="badge text-bg-light border">ML</span></h2>
+      <div class="row g-2 text-center mb-3">
+        <div class="col"><div class="border rounded p-2"><div class="small text-secondary">P10</div><div class="fw-semibold">{{ job.price_p10|whole_money }}</div></div></div>
+        <div class="col"><div class="border rounded p-2"><div class="small text-secondary">Reference (P50)</div><div class="fw-semibold">{{ job.price_p50|whole_money }}</div></div></div>
+        <div class="col"><div class="border rounded p-2"><div class="small text-secondary">P90</div><div class="fw-semibold">{{ job.price_p90|whole_money }}</div></div></div>
+        <div class="col"><div class="border rounded p-2 border-danger"><div class="small text-secondary">Quotation</div><div class="fw-semibold text-danger">{{ quote.amount|money }}</div></div></div>
+      </div>
+      <p class="mb-1">The quotation is <strong>{{ distance }}</strong> ({% if deviation > 0 %}+{% endif %}{{ deviation }}% vs reference price).</p>
+      <p class="small text-secondary mb-0">Model version {{ job.model_version }}. The prediction was saved when the homeowner chose the slot.</p>
+    </div></div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Request</h2>
+      <p class="small">{{ job.description|linebreaksbr }}</p>
+      <div class="d-flex flex-wrap gap-2">{% for p in photos %}<a href="{{ p.image.url }}" target="_blank"><img class="photo-thumb" src="{{ p.image.url }}" alt=""></a>{% endfor %}</div>
+    </div></div>
+  </div>
+
+  <div class="col-xl-5">
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">{{ quote.handyman.user.get_full_name }}'s quotation</h2>
+      <dl class="small">
+        <dt>Work to be done</dt><dd>{{ quote.work_description|linebreaksbr }}</dd>
+        <dt>Justification</dt><dd>{{ quote.justification|default:"–"|linebreaksbr }}</dd>
+      </dl>
+      {% if quote.status == 'UNDER_REVIEW' %}
+        <form method="post" class="mb-3">
+          {% csrf_token %}
+          <input name="note" class="form-control mb-2" placeholder="Optional note">
+          <button class="btn btn-success" name="action" value="release">Release to homeowner</button>
+        </form>
+        <form method="post">
+          {% csrf_token %}
+          {% include 'partials/form_fields.html' with form=form %}
+          <button class="btn btn-outline-warning" name="action" value="return">Return to handyman</button>
+        </form>
+      {% else %}
+        <p class="small">Reviewed by {{ quote.reviewed_by|default:"–" }} {% if quote.reviewed_at %}on {{ quote.reviewed_at|date:"j M Y, g:i A" }}{% endif %}. {{ quote.review_note }}</p>
+      {% endif %}
+    </div></div>
+  </div>
+</div>
+{% endblock %}

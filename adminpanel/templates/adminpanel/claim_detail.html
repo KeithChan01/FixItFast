@@ -1,0 +1,67 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'adminpanel:claims' %}">&larr; Warranty claims</a>
+<h1 class="h4 mb-1">Claim on job #{{ job.pk }}</h1>
+<p class="small text-secondary">{{ job.job_type }} · {% tier_badge job.tier %} · {{ job.homeowner.get_full_name }} · completed {{ job.confirmed_at|date:"j M Y" }} · warranty until {{ job.warranty_ends_at|date:"j M Y" }} · {% status_badge claim.status claim.get_status_display %}</p>
+
+<div class="row g-4">
+  <div class="col-xl-6">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Homeowner's description</h2>
+      <p>{{ claim.description|linebreaksbr }}</p>
+      <div class="d-flex flex-wrap gap-2">{% for p in photos %}<a href="{{ p.image.url }}" target="_blank"><img class="photo-thumb" src="{{ p.image.url }}" alt=""></a>{% endfor %}</div>
+      {% if work_photos %}
+        <h3 class="h6 mt-3">Original work photos</h3>
+        <div class="d-flex flex-wrap gap-2">{% for p in work_photos %}<a href="{{ p.image.url }}" target="_blank"><img class="photo-thumb" src="{{ p.image.url }}" alt="{{ p.get_kind_display }}"></a>{% endfor %}</div>
+      {% endif %}
+    </div></div>
+    <div class="card border-0 shadow-sm"><div class="card-body small">
+      <h2 class="h6 fw-semibold">Job</h2>
+      Handyman: {{ job.handyman.user.get_full_name }} · Net paid {{ summary.net_paid|money }} · <a href="{% url 'adminpanel:job_detail' job.pk %}">Job record</a>
+      {% if claim.return_visit_at %}<div class="mt-2">Return visit: {{ claim.return_visit_at|date:"D j M, g:i A" }}{% if claim.replacement_handyman %} with replacement {{ claim.replacement_handyman.user.get_full_name }}{% endif %}</div>{% endif %}
+      {% if claim.resolution_note %}<div class="mt-2">Note: {{ claim.resolution_note }}</div>{% endif %}
+      {% if claim.handled_by %}<div class="text-secondary mt-2">Handled by {{ claim.handled_by }}</div>{% endif %}
+    </div></div>
+  </div>
+
+  <div class="col-xl-6">
+    {% if closed %}
+      <div class="alert alert-secondary">This claim is {{ claim.get_status_display|lower }}.</div>
+    {% else %}
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h2 class="h6 fw-semibold">{{ job.get_tier_display }} remedy</h2>
+        {% if job.tier == 'STANDARD' %}
+          <p class="small text-secondary">Approve a full or partial refund, or reject the claim.</p>
+          <form method="post">{% csrf_token %}
+            {% include 'partials/form_fields.html' with form=refund_form %}
+            <button class="btn btn-success" name="action" value="refund">Refund and resolve</button></form>
+        {% else %}
+          <p class="small text-secondary">Schedule a free return visit with the original handyman.
+            {% if job.tier == 'PLATINUM' %}If they are not free within three days, assign a replacement Platinum handyman.{% endif %}</p>
+          {% if original_available is not None %}
+            <div class="alert {% if original_available %}alert-success{% else %}alert-warning{% endif %} small py-2">
+              {{ job.handyman.user.get_full_name }} {% if original_available %}has free slots{% else %}has no free slots{% endif %} in the next three days.
+            </div>
+          {% endif %}
+          <form method="post">{% csrf_token %}
+            {% include 'partials/form_fields.html' with form=visit_form %}
+            <button class="btn btn-success" name="action" value="visit">Schedule return visit</button></form>
+          {% if claim.status == 'RETURN_VISIT' %}
+            <form method="post" class="mt-3">{% csrf_token %}
+              <input name="note" class="form-control mb-2" placeholder="Resolution note">
+              <button class="btn btn-primary" name="action" value="resolve">Mark resolved</button></form>
+          {% endif %}
+        {% endif %}
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h2 class="h6 fw-semibold">Reject claim</h2>
+        <form method="post">{% csrf_token %}
+          {% include 'partials/form_fields.html' with form=reject_form %}
+          <button class="btn btn-outline-danger" name="action" value="reject">Reject</button></form>
+      </div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

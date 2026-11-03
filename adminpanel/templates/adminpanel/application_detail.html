@@ -1,0 +1,61 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'adminpanel:applications' %}">&larr; Applications</a>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-1">{{ handyman.user.get_full_name }}</h1>
+    {% status_badge handyman.application_status handyman.get_application_status_display %} {% tier_badge handyman.tier %}
+    <div class="small text-secondary mt-1">{{ handyman.user.email }} · {{ handyman.user.mobile }} · {{ handyman.years_experience }} years' experience</div>
+    <div class="small">Job types: {% for jt in handyman.job_types.all %}{{ jt.name }}{% if not forloop.last %}, {% endif %}{% empty %}none{% endfor %}</div>
+  </div>
+  {% if handyman.application_status == 'APPROVED' %}<a class="btn btn-outline-secondary btn-sm" href="{% url 'adminpanel:handyman_detail' handyman.pk %}">Handyman record</a>{% endif %}
+</div>
+
+<div class="card border-0 shadow-sm mb-4"><div class="card-body">
+  <h2 class="h6 fw-semibold">Documents</h2>
+  {% for doc in documents %}
+    <div class="border-bottom py-3 d-flex flex-wrap gap-3 justify-content-between">
+      <div>
+        <strong>{{ doc.get_doc_type_display }}</strong> – {{ doc.title }} {% status_badge doc.status doc.get_status_display %}
+        <div class="small text-secondary">Expires: {{ doc.expiry_date|date:"j M Y"|default:"no expiry" }}
+          {% if doc.job_types.all %} · Covers: {% for jt in doc.job_types.all %}{{ jt.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</div>
+        <a class="small" href="{{ doc.file.url }}" target="_blank"><i class="bi bi-file-earmark"></i> Open file</a>
+        {% if doc.reviewed_by %}<div class="small text-secondary">Reviewed by {{ doc.reviewed_by }} on {{ doc.reviewed_at|date:"j M Y, g:i A" }}</div>{% endif %}
+        {% if doc.rejection_reason %}<div class="small text-danger">{{ doc.rejection_reason }}</div>{% endif %}
+      </div>
+      {% if doc.status == 'PENDING' %}
+        <form method="post" action="{% url 'adminpanel:review_document' doc.pk %}" class="d-flex flex-wrap gap-2 align-items-start" style="max-width: 26rem">
+          {% csrf_token %}
+          <input name="reason" placeholder="Reason (required to reject)" class="form-control form-control-sm">
+          <button class="btn btn-sm btn-success" name="action" value="approve">Approve</button>
+          <button class="btn btn-sm btn-outline-danger" name="action" value="reject">Reject</button>
+        </form>
+      {% endif %}
+    </div>
+  {% empty %}<p class="text-secondary small">No documents.</p>{% endfor %}
+</div></div>
+
+{% if handyman.application_status == 'PENDING' %}
+<div class="card border-0 shadow-sm"><div class="card-body">
+  <h2 class="h6 fw-semibold">Decision</h2>
+  <div class="row g-4">
+    <div class="col-md-5">
+      <form method="post" action="{% url 'adminpanel:decide_application' handyman.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-success" name="action" value="approve" {% if not has_identity %}disabled{% endif %}>Approve at Standard tier</button>
+        {% if not has_identity %}<div class="small text-secondary mt-1">Approve the identity document first.</div>{% endif %}
+      </form>
+    </div>
+    <div class="col-md-7">
+      <form method="post" action="{% url 'adminpanel:decide_application' handyman.pk %}">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=reason_form %}
+        <button class="btn btn-outline-danger" name="action" value="reject">Reject application</button>
+      </form>
+    </div>
+  </div>
+</div></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<h1 class="h4 mb-4">Dashboard</h1>
+
+<div class="row g-3 mb-4">
+  {% for label, count, url, icon in queues %}
+    <div class="col-sm-6 col-xl-3">
+      <a href="{% url url %}" class="card stat-card border-0 shadow-sm text-decoration-none h-100">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div><div class="text-secondary small">{{ label }}</div><div class="value text-body">{{ count }}</div></div>
+          <i class="bi {{ icon }} fs-2 {% if count %}text-warning{% else %}text-secondary{% endif %}"></i>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+
+{% if problems %}
+  <div class="alert alert-danger">
+    <strong>Problems reported by homeowners:</strong>
+    {% for job in problems %}<a class="alert-link ms-2" href="{% url 'adminpanel:job_detail' job.pk %}">#{{ job.pk }}</a>{% endfor %}
+  </div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="card border-0 shadow-sm h-100"><div class="card-body">
+      <h2 class="h6 fw-semibold">Today's jobs</h2>
+      <div class="mb-3">{% for label, status, n in today_by_status %}<span class="me-2">{% status_badge status label %} {{ n }}</span>{% empty %}<span class="small text-secondary">No jobs today.</span>{% endfor %}</div>
+      <table class="table table-sm small mb-0">
+        {% for job in todays_jobs %}
+          <tr>
+            <td>{{ job.slot_start|time:"g:i A" }}</td>
+            <td><a href="{% url 'adminpanel:job_detail' job.pk %}">#{{ job.pk }} · {{ job.job_type }}</a></td>
+            <td>{{ job.handyman.user.get_full_name|default:"–" }}</td>
+            <td>{% status_badge job.status job.get_status_display %}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div></div>
+  </div>
+  <div class="col-xl-5">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Launch measures</h2>
+      {% for label, pct, detail in measures %}
+        <div class="mb-3">
+          <div class="d-flex justify-content-between small"><span>{{ label }}</span><span class="fw-semibold">{% if pct is not None %}{{ pct }}%{% else %}–{% endif %}</span></div>
+          <div class="progress" style="height:.5rem" role="progressbar" aria-valuenow="{{ pct|default:0 }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ pct|default:0 }}%"></div></div>
+          <div class="small text-secondary">{{ detail }}</div>
+        </div>
+      {% endfor %}
+      <p class="small text-secondary mb-0">The model's range is designed so about 8 in 10 quotations are released automatically.</p>
+    </div></div>
+
+    {% if revenue %}
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Revenue this month <span class="badge text-bg-light border">Managers only</span></h2>
+      <table class="table table-sm small mb-0">
+        <tr><td>Commission on completed jobs</td><td class="text-end">{{ revenue.commission|money }}</td></tr>
+        <tr><td>Service fees</td><td class="text-end">{{ revenue.service_fees|money }}</td></tr>
+        <tr><td>Commission on consultation fees</td><td class="text-end">{{ revenue.consultation|money }}</td></tr>
+        <tr class="fw-semibold"><td>Total</td><td class="text-end">{{ revenue.total|money }}</td></tr>
+      </table>
+    </div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

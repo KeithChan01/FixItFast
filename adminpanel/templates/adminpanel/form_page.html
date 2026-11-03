@@ -1,0 +1,14 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block content %}
+<a class="small" href="{% url back %}">&larr; Back</a>
+<h1 class="h4 mb-3">{{ title }}</h1>
+{% if help %}<p class="text-secondary small">{{ help }}</p>{% endif %}
+<div class="card border-0 shadow-sm" style="max-width: 40rem"><div class="card-body">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include 'partials/form_fields.html' with form=form %}
+    <button class="btn btn-primary" type="submit">Save</button>
+  </form>
+</div></div>
+{% endblock %}

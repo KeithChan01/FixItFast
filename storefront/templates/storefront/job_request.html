@@ -1,0 +1,22 @@
+{% extends 'storefront/base.html' %}
+{% block title %}Book a repair · FixItFast{% endblock %}
+
+{% block content %}
+{% include 'storefront/partials/booking_steps.html' with step=1 %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4">Describe the problem</h1>
+        <p class="text-secondary small">Tell us once. The handyman quotes from this description and your photos.</p>
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          {% include 'partials/form_fields.html' with form=form %}
+          <p class="small"><a href="{% url 'storefront:account' %}">Add another address</a></p>
+          <button class="btn btn-primary" type="submit">Continue to tier</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

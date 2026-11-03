@@ -1,0 +1,48 @@
+{% extends 'partner/base.html' %}
+{% block title %}Apply · FixItFast Partners{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h4">Join FixItFast as a handyman</h1>
+    <p class="text-secondary">Get repair requests matched to your skills, with a reference price for every job. Early partners pay a reduced 10% commission on their first 20 jobs.</p>
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+      <div class="card border-0 shadow-sm mb-3"><div class="card-body">
+        <h2 class="h6 fw-semibold">About you</h2>
+        <div class="row">
+          {% for field in form %}{% if field.name in 'first_name last_name email mobile password1 password2 years_experience' %}
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+              {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}{% endfor %}
+        </div>
+      </div></div>
+
+      <div class="card border-0 shadow-sm mb-3"><div class="card-body">
+        <h2 class="h6 fw-semibold">Job types</h2>
+        <p class="small text-secondary">{{ form.job_types.help_text }}</p>
+        <div class="row">{% for cb in form.job_types %}<div class="col-md-6"><div class="form-check">{{ cb.tag }} <label class="form-check-label" for="{{ cb.id_for_label }}">{{ cb.choice_label }}</label></div></div>{% endfor %}</div>
+        {% for error in form.job_types.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div></div>
+
+      <div class="card border-0 shadow-sm mb-3"><div class="card-body">
+        <h2 class="h6 fw-semibold">Documents</h2>
+        <p class="small text-secondary">An employee verifies every document before you can receive jobs.</p>
+        <div class="row">
+          {% for field in form %}{% if field.name in 'identity_document certificate certificate_title certificate_expiry licence licence_title licence_expiry insurance insurance_expiry' %}
+            <div class="col-md-4 mb-3">
+              <label class="form-label small" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>{{ field }}
+              {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+              {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}{% endfor %}
+        </div>
+      </div></div>
+      <button class="btn btn-primary btn-lg" type="submit">Submit application</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{
+  "model_version": "v20261103",
+  "records": 12000,
+  "train_records": 9600,
+  "holdout_records": 2400,
+  "holdout_coverage_p10_p90": 0.7829,
+  "holdout_mae_p50": 23.47,
+  "holdout_pinball_loss": {
+    "10": 4.604,
+    "50": 11.735,
+    "90": 5.926
+  }
+}

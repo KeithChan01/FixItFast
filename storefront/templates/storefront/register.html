@@ -1,0 +1,21 @@
+{% extends 'storefront/base.html' %}
+{% block title %}Create an account · FixItFast{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-5">
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-body p-4">
+        <h1 class="h4">Create your account</h1>
+        <p class="text-secondary small">Save your details once and book repairs in minutes.</p>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include 'partials/form_fields.html' with form=form %}
+          <button class="btn btn-primary w-100" type="submit">Create account</button>
+        </form>
+        <p class="small text-center mt-3 mb-0">Already registered? <a href="{% url 'storefront:login' %}">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

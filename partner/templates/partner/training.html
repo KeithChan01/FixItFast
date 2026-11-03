@@ -1,0 +1,34 @@
+{% extends 'partner/base.html' %}
+
+{% block content %}
+<h1 class="h4 mb-1">Platinum service-standards training</h1>
+<p class="text-secondary">Read the five modules, then pass the quiz (80%) to count towards Platinum.</p>
+
+{% if passed %}
+  <div class="alert alert-success"><i class="bi bi-check-circle"></i> You have passed the training quiz. An employee will confirm your Platinum upgrade once you meet the other requirements.</div>
+{% elif retake_at %}
+  <div class="alert alert-warning">You can retake the quiz after {{ retake_at|date:"D j M, g:i A" }}.</div>
+{% endif %}
+
+<div class="accordion mb-4" id="modules">
+  {% for module in modules %}
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#m{{ module.pk }}">
+          Module {{ module.order }}: {{ module.title }}
+        </button>
+      </h2>
+      <div id="m{{ module.pk }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#modules">
+        <div class="accordion-body">{{ module.content|linebreaks }}</div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% if not passed and not retake_at %}<a class="btn btn-primary" href="{% url 'partner:quiz' %}">Take the quiz</a>{% endif %}
+
+{% if attempts %}
+  <h2 class="h6 mt-4">Your attempts</h2>
+  <ul class="small">{% for a in attempts %}<li>{{ a.taken_at|date:"j M Y, g:i A" }} – {% widthratio a.score 1 100 %}% {% if a.passed %}(passed){% else %}(not passed){% endif %}</li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

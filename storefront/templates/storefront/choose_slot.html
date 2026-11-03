@@ -1,0 +1,50 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}Choose a slot · FixItFast{% endblock %}
+
+{% block content %}
+{% include 'storefront/partials/booking_steps.html' with step=3 %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-1">Choose a time</h1>
+    <p class="text-secondary mb-0">{{ job.job_type }} &middot; {% tier_badge job.tier %} &middot; {{ job.address.get_planning_region_display }} region
+      &middot; <a href="{% url 'storefront:choose_tier' job.pk %}">change tier</a></p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  {% for band, range in ranges.items %}
+    <div class="col-sm-6">
+      <div class="card border-0 shadow-sm band-{{ band }}"><div class="card-body py-2">
+        <div class="small text-secondary">{{ band }}{% if band == 'Peak' %} &middot; weekday evenings and weekends{% else %} &middot; weekdays 9 a.m. to 6 p.m.{% endif %}</div>
+        <div class="fw-semibold">{{ range.low|whole_money }} – {{ range.high|whole_money }}</div>
+      </div></div>
+    </div>
+  {% endfor %}
+</div>
+<p class="small text-secondary">
+  <i class="bi bi-graph-up"></i> Ranges are estimates from similar past repairs for this tier and time. About 8 in 10 similar jobs cost within the range.
+  The handyman's quotation is the amount you accept.
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  {% for day, slots in days %}
+    <h2 class="h6 mt-4">{{ day|date:"l, j F" }}</h2>
+    <div class="d-flex flex-wrap gap-2">
+      {% for slot in slots %}
+        <button type="submit" name="slot" value="{{ slot.value }}" class="btn btn-light border slot-btn band-{{ slot.band }}">
+          <div>{{ slot.start|time:"g:i A" }}</div>
+          <div class="range">{{ slot.range.low|whole_money }}–{{ slot.range.high|whole_money }}</div>
+          <div class="small text-secondary">{{ slot.band }}</div>
+        </button>
+      {% endfor %}
+    </div>
+  {% empty %}
+    <div class="alert alert-info">
+      No {{ job.get_tier_display }} handymen are free for this repair in the next 14 days.
+      <a href="{% url 'storefront:choose_tier' job.pk %}">Try another tier</a>.
+    </div>
+  {% endfor %}
+</form>
+{% endblock %}

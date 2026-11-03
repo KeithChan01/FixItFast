@@ -1,0 +1,61 @@
+{% extends 'partner/base.html' %}
+
+{% block content %}
+<h1 class="h4 mb-1">Availability</h1>
+<p class="text-secondary">Tick the two-hour slots you can usually attend. Booked slots are blocked automatically.
+  <span class="badge text-bg-warning">Peak</span> slots carry a higher price range for homeowners.</p>
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="table-responsive">
+          <table class="table table-sm text-center align-middle mb-3">
+            <thead><tr><th class="text-start">Start</th>{% for day in weekdays %}<th>{{ day }}</th>{% endfor %}</tr></thead>
+            <tbody>
+              {% for row in grid %}
+                <tr>
+                  <th class="text-start fw-normal small">{{ row.time|time:"g A" }}–{{ row.end|time:"g A" }}</th>
+                  {% for cell in row.cells %}
+                    <td class="{% if cell.peak %}bg-warning-subtle{% endif %}">
+                      <input class="form-check-input" type="checkbox" name="slots" value="{{ cell.value }}" {% if cell.checked %}checked{% endif %} aria-label="{{ cell.value }}">
+                    </td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-primary" name="save_weekly" type="submit">Save weekly availability</button>
+      </form>
+    </div></div>
+  </div>
+
+  <div class="col-xl-4">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Time off</h2>
+      <form method="post">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=exception_form %}
+        <button class="btn btn-outline-primary btn-sm" name="add_exception" type="submit">Add time off</button>
+      </form>
+      <ul class="list-unstyled small mt-3 mb-0">
+        {% for exc in exceptions %}
+          <li class="d-flex justify-content-between border-bottom py-1">
+            <span>{{ exc.date|date:"D j M" }} · {% if exc.start_time %}{{ exc.start_time|time:"g A" }}{% else %}whole day{% endif %} {{ exc.reason }}</span>
+            <form method="post">{% csrf_token %}<button class="btn btn-link btn-sm p-0 text-danger" name="delete_exception" value="{{ exc.pk }}">Remove</button></form>
+          </li>
+        {% endfor %}
+      </ul>
+    </div></div>
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Booked slots</h2>
+      <ul class="list-unstyled small mb-0">
+        {% for job in booked %}<li><a href="{% url 'partner:job_detail' job.pk %}">{{ job.slot_start|date:"D j M, g:i A" }}</a> · {{ job.job_type }}</li>
+        {% empty %}<li class="text-secondary">None.</li>{% endfor %}
+      </ul>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'partner/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h4">Your application</h1>
+    <p>Status: {% status_badge profile.application_status profile.get_application_status_display %}</p>
+    {% if profile.application_status == 'PENDING' %}
+      <div class="alert alert-info">We are checking your documents. You'll be notified here once a decision is made.</div>
+    {% elif profile.application_status == 'REJECTED' %}
+      <div class="alert alert-danger"><strong>Reason:</strong> {{ profile.rejection_reason }}</div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Documents</h2>
+      {% include 'partner/partials/documents_table.html' %}
+    </div></div>
+
+    {% if profile.application_status == 'REJECTED' %}
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Upload a corrected document and resubmit</h2>
+      <form method="post" action="{% url 'partner:resubmit' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=form %}
+        <button class="btn btn-primary" name="resubmit" type="submit">Upload and resubmit application</button>
+      </form>
+    </div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

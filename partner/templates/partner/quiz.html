@@ -1,0 +1,21 @@
+{% extends 'partner/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h4">Training quiz</h1>
+    <p class="text-secondary">Answer all questions. The pass mark is 80%.</p>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="card border-0 shadow-sm mb-3"><div class="card-body">
+          <p class="fw-semibold mb-2">{{ forloop.counter }}. {{ field.label }}</p>
+          {% for radio in field %}<div class="form-check">{{ radio.tag }} <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label></div>{% endfor %}
+          {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div></div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Submit answers</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

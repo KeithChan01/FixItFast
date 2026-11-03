@@ -1,0 +1,42 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<h1 class="h4 mb-3">Handyman applications</h1>
+
+<h2 class="h6 fw-semibold">Pending applications</h2>
+<div class="card border-0 shadow-sm table-responsive mb-4">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Applicant</th><th>Experience</th><th>Documents</th><th>Applied</th><th></th></tr></thead>
+    <tbody>
+      {% for h in pending %}
+        <tr>
+          <td>{{ h.user.get_full_name }}<div class="small text-secondary">{{ h.user.email }} · {{ h.user.mobile }}</div></td>
+          <td>{{ h.years_experience }} yrs</td>
+          <td>{{ h.docs }}</td>
+          <td class="small">{{ h.created_at|date:"j M Y" }}</td>
+          <td><a class="btn btn-sm btn-primary" href="{% url 'adminpanel:application_detail' h.pk %}">Review</a></td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-secondary">No pending applications.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 class="h6 fw-semibold">New documents from existing partners</h2>
+<div class="card border-0 shadow-sm table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Handyman</th><th>Document</th><th>Expires</th><th>Uploaded</th><th></th></tr></thead>
+    <tbody>
+      {% for doc in new_documents %}
+        <tr>
+          <td>{{ doc.handyman.user.get_full_name }} {% tier_badge doc.handyman.tier %}</td>
+          <td>{{ doc.get_doc_type_display }}<div class="small text-secondary">{{ doc.title }}</div></td>
+          <td class="small">{{ doc.expiry_date|date:"j M Y"|default:"–" }}</td>
+          <td class="small">{{ doc.uploaded_at|date:"j M Y" }}</td>
+          <td><a class="btn btn-sm btn-primary" href="{% url 'adminpanel:application_detail' doc.handyman_id %}">Review</a></td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-secondary">No new documents.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

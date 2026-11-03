@@ -1,0 +1,45 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}Receipt #{{ job.pk }} · FixItFast{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="d-flex justify-content-between mb-3 no-print">
+      <a href="{% url 'storefront:job_detail' job.pk %}">&larr; Back to job</a>
+      <span class="small text-secondary">Use your browser's Print to save a copy.</span>
+    </div>
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+      <div class="d-flex justify-content-between mb-4">
+        <div><span class="brand fs-4">FixIt<span class="accent">Fast</span></span><div class="small text-secondary">Receipt for job #{{ job.pk }}</div></div>
+        <div class="text-end small">{{ job.homeowner.get_full_name }}<br>{{ job.address }}</div>
+      </div>
+      <dl class="row small">
+        <dt class="col-4">Repair</dt><dd class="col-8">{{ job.job_type }} ({{ job.get_tier_display }})</dd>
+        <dt class="col-4">Handyman</dt><dd class="col-8">{{ job.handyman.user.get_full_name|default:"–" }}</dd>
+        <dt class="col-4">Appointment</dt><dd class="col-8">{{ job.slot_start|date:"j M Y, g:i A" }}</dd>
+        <dt class="col-4">Status</dt><dd class="col-8">{{ job.get_status_display }}</dd>
+        {% if job.warranty_ends_at %}<dt class="col-4">Warranty ends</dt><dd class="col-8">{{ job.warranty_ends_at|date:"j M Y" }}</dd>{% endif %}
+      </dl>
+      <table class="table">
+        <thead><tr><th>Item</th><th class="text-end">Amount</th></tr></thead>
+        <tbody>
+          {% if quote %}<tr><td>Repair quotation{% if quote.work_description %}<div class="small text-secondary">{{ quote.work_description }}</div>{% endif %}</td><td class="text-end">{{ quote.amount|money }}</td></tr>{% endif %}
+          {% for part in parts %}<tr><td>Part: {{ part.name }}</td><td class="text-end">{{ part.price|money }}</td></tr>{% endfor %}
+          {% if summary.service_fee %}<tr><td>Platform service fee</td><td class="text-end">{{ summary.service_fee|money }}</td></tr>{% endif %}
+          {% if summary.fee_waived %}<tr><td>Platform service fee (first-job waiver)</td><td class="text-end"><s>{{ summary.fee_waived|money }}</s> S$0.00</td></tr>{% endif %}
+          {% if summary.consultation_fee %}<tr><td>Consultation fee (repair declined after visit started)</td><td class="text-end">{{ summary.consultation_fee|money }}</td></tr>{% endif %}
+          {% if summary.refunds %}<tr><td>Refunds</td><td class="text-end">−{{ summary.refunds|money }}</td></tr>{% endif %}
+        </tbody>
+        <tfoot><tr class="fw-semibold"><td>Net paid</td><td class="text-end">{{ summary.net_paid|money }}</td></tr></tfoot>
+      </table>
+      <h2 class="h6 mt-4">Payment history</h2>
+      <table class="table table-sm small mb-0">
+        {% for entry in ledger %}{% if entry.entry_type in 'QUOTE_HELD SERVICE_FEE PART_PAYMENT CONSULT_FEE REFUND' %}
+          <tr><td>{{ entry.created_at|date:"j M Y, g:i A" }}</td><td>{{ entry.get_entry_type_display }}</td><td class="text-end">{{ entry.amount|money }}</td></tr>
+        {% endif %}{% endfor %}
+      </table>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

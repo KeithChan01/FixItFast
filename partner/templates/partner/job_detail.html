@@ -1,0 +1,133 @@
+{% extends 'partner/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'partner:jobs' %}">&larr; My jobs</a>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-1">#{{ job.pk }} · {{ job.job_type }}</h1>
+    {% status_badge job.status job.get_status_display %} {% tier_badge job.tier %}
+  </div>
+  {% if job.status == 'SCHEDULED' or job.status == 'ON_THE_WAY' or job.status == 'IN_PROGRESS' %}
+    <form method="post" action="{% url 'partner:update_progress' job.pk %}">
+      {% csrf_token %}
+      <button class="btn btn-primary" {% if blockers %}disabled{% endif %}>
+        {% if job.status == 'SCHEDULED' %}I'm on the way{% elif job.status == 'ON_THE_WAY' %}Start work{% else %}Mark completed{% endif %}
+      </button>
+    </form>
+  {% endif %}
+</div>
+
+{% for problem in blockers %}<div class="alert alert-warning py-2 small mb-2">{{ problem }}</div>{% endfor %}
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Request</h2>
+      <dl class="row small mb-0">
+        <dt class="col-sm-4">Slot</dt><dd class="col-sm-8">{{ job.slot_start|date:"D j M Y, g:i A" }} – {{ job.slot_end|time:"g:i A" }} ({{ job.timing_band }})</dd>
+        <dt class="col-sm-4">Location</dt>
+        <dd class="col-sm-8">{% if show_address %}{{ job.address }}<br>{{ job.homeowner.get_full_name }} · {{ job.homeowner.mobile }}{% else %}{{ job.planning_region }} region <span class="text-secondary">(full address shown after payment)</span>{% endif %}</dd>
+        <dt class="col-sm-4">Description</dt><dd class="col-sm-8">{{ job.description|linebreaksbr }}</dd>
+      </dl>
+      {% if request_photos %}<div class="d-flex flex-wrap gap-2 mt-2">{% for p in request_photos %}<a href="{{ p.image.url }}" target="_blank"><img class="photo-thumb" src="{{ p.image.url }}" alt=""></a>{% endfor %}</div>{% endif %}
+    </div></div>
+
+    {% if needs_quote %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Submit your quotation</h2>
+      <p class="small">Quote by <strong>{{ job.quote_deadline|date:"g:i A, D j M" }}</strong> or the job moves to the next handyman.</p>
+      <div class="row g-2 mb-3 text-center">
+        <div class="col"><div class="border rounded p-2"><div class="small text-secondary">Range low (P10)</div><div class="fw-semibold">{{ job.price_p10|whole_money }}</div></div></div>
+        <div class="col"><div class="border rounded p-2 border-primary"><div class="small text-secondary">Reference price (P50)</div><div class="fw-semibold text-primary">{{ job.price_p50|whole_money }}</div></div></div>
+        <div class="col"><div class="border rounded p-2"><div class="small text-secondary">Range high (P90)</div><div class="fw-semibold">{{ job.price_p90|whole_money }}</div></div></div>
+      </div>
+      <p class="small text-secondary">From similar past {{ job.get_tier_display }} {{ job.timing_band|lower }} jobs. A quotation within the range goes to the homeowner straight away; one outside it is checked by FixItFast first.</p>
+      <form method="post" action="{% url 'partner:submit_quote' job.pk %}" novalidate>
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=quote_form %}
+        <button class="btn btn-primary" type="submit">Send quotation</button>
+      </form>
+      <hr>
+      <details>
+        <summary class="small text-danger">Can't take this job?</summary>
+        <form method="post" action="{% url 'partner:decline_job' job.pk %}" class="mt-2">
+          {% csrf_token %}
+          {% include 'partials/form_fields.html' with form=decline_form %}
+          <button class="btn btn-outline-danger btn-sm" type="submit">Decline job</button>
+        </form>
+      </details>
+    </div></div>
+    {% endif %}
+
+    {% if photo_form %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Before and after photos</h2>
+      <form method="post" action="{% url 'partner:upload_photos' job.pk %}" enctype="multipart/form-data" class="row g-2 align-items-end">
+        {% csrf_token %}
+        <div class="col-sm-4">{{ photo_form.kind }}</div>
+        <div class="col-sm-5">{{ photo_form.images }}</div>
+        <div class="col-sm-3"><button class="btn btn-outline-primary w-100">Upload</button></div>
+      </form>
+    </div></div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Add a replacement part</h2>
+      <form method="post" action="{% url 'partner:add_part' job.pk %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=part_form %}
+        <button class="btn btn-outline-primary">Send to homeowner</button>
+      </form>
+    </div></div>
+    {% endif %}
+
+    {% if work_photos %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Work photos</h2>
+      <div class="d-flex flex-wrap gap-2">{% for p in work_photos %}<figure class="mb-0 text-center"><img class="photo-thumb" src="{{ p.image.url }}" alt=""><figcaption class="small text-secondary">{{ p.get_kind_display }}</figcaption></figure>{% endfor %}</div>
+    </div></div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Quotations</h2>
+      {% for q in quotations %}
+        <div class="border-bottom py-2 small">
+          <div class="d-flex justify-content-between"><strong>{{ q.amount|money }}</strong> {% status_badge q.status q.get_status_display %}</div>
+          <div>{{ q.work_description }}</div>
+          {% if q.auto_released %}<div class="text-success">Released automatically (within range)</div>{% endif %}
+          {% if q.review_note %}<div class="text-danger">FixItFast: {{ q.review_note }}</div>{% endif %}
+        </div>
+      {% empty %}<p class="small text-secondary mb-0">None yet.</p>{% endfor %}
+    </div></div>
+
+    {% if parts %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Parts</h2>
+      <table class="table table-sm small mb-0">
+        {% for part in parts %}
+          <tr><td>{{ part.name }}{% if part.flagged %} <span class="badge text-bg-warning">Above range</span>{% endif %}</td><td>{{ part.price|money }}</td>
+            <td>{% status_badge part.homeowner_decision part.get_homeowner_decision_display %}{% if part.flagged %}<br>{% status_badge part.review_status part.get_review_status_display %}{% endif %}</td></tr>
+        {% endfor %}
+      </table>
+    </div></div>
+    {% endif %}
+
+    {% if payouts %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Your earnings</h2>
+      <table class="table table-sm small mb-0">
+        {% for entry in payouts %}<tr><td>{{ entry.get_entry_type_display }}{% if entry.commission_rate %} ({% widthratio entry.commission_rate 1 100 %}%){% endif %}<div class="text-secondary">{{ entry.note }}</div></td><td class="text-end">{% if entry.entry_type == 'COMMISSION' %}−{% endif %}{{ entry.amount|money }}</td></tr>{% endfor %}
+      </table>
+    </div></div>
+    {% else %}
+      <p class="small text-secondary">Your commission rate is {% widthratio commission_rate 1 100 %}%.</p>
+    {% endif %}
+
+    {% for claim in claims %}
+      <div class="alert alert-warning small">Warranty claim: {{ claim.get_status_display }}{% if claim.return_visit_at %} · return visit {{ claim.return_visit_at|date:"D j M, g:i A" }}{% endif %}<br>{{ claim.description }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

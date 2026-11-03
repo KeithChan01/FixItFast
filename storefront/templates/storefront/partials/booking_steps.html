@@ -1,0 +1,8 @@
+{# Booking progress: {% include 'storefront/partials/booking_steps.html' with step=3 %} #}
+<div class="booking-steps mb-4" aria-label="Booking progress">
+  <span class="{% if step == 1 %}current{% elif step > 1 %}done{% endif %}">1 · Describe</span>
+  <span class="{% if step == 2 %}current{% elif step > 2 %}done{% endif %}">2 · Tier</span>
+  <span class="{% if step == 3 %}current{% elif step > 3 %}done{% endif %}">3 · Slot &amp; price</span>
+  <span class="{% if step == 4 %}current{% elif step > 4 %}done{% endif %}">4 · Handyman</span>
+  <span class="{% if step == 5 %}current{% elif step > 5 %}done{% endif %}">5 · Quote &amp; pay</span>
+</div>

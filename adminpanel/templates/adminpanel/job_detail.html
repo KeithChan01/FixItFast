@@ -1,0 +1,84 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'adminpanel:jobs' %}">&larr; Jobs</a>
+<h1 class="h4 mb-1">#{{ job.pk }} · {{ job.job_type }}</h1>
+<p class="small">{% status_badge job.status job.get_status_display %} {% tier_badge job.tier %} {{ job.timing_band }} · {{ job.slot_start|date:"D j M Y, g:i A"|default:"no slot" }}</p>
+{% if job.problem_note %}<div class="alert alert-danger"><strong>Problem reported:</strong> {{ job.problem_note }}</div>{% endif %}
+
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Payment ledger</h2>
+      <table class="table table-sm small">
+        <thead><tr><th>When</th><th>Entry</th><th>Note</th><th class="text-end">Amount</th></tr></thead>
+        {% for e in ledger %}
+          <tr><td>{{ e.created_at|date:"j M, g:i A" }}</td><td>{{ e.get_entry_type_display }}{% if e.commission_rate %} ({% widthratio e.commission_rate 1 100 %}%){% endif %}</td><td>{{ e.note }}</td><td class="text-end">{% if e.entry_type == 'FEE_WAIVED' %}<s class="text-secondary">{{ e.amount|money }}</s> S$0.00{% else %}{{ e.amount|money }}{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="4" class="text-secondary">No payments yet.</td></tr>{% endfor %}
+      </table>
+      <div class="row small g-2">
+        <div class="col-sm-4"><div class="border rounded p-2"><div class="text-secondary">Net paid by homeowner</div><strong>{{ summary.net_paid|money }}</strong></div></div>
+        <div class="col-sm-4"><div class="border rounded p-2"><div class="text-secondary">Handyman payout</div><strong>{{ summary.payout|money }}</strong>{% if summary.held %}<div class="text-warning">{{ summary.held|money }} held</div>{% endif %}</div></div>
+        <div class="col-sm-4"><div class="border rounded p-2"><div class="text-secondary">Platform revenue</div><strong>{{ summary.platform_revenue|money }}</strong></div></div>
+      </div>
+    </div></div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Quotations</h2>
+      <table class="table table-sm small mb-0">
+        {% for q in quotations %}<tr><td>{{ q.created_at|date:"j M, g:i A" }}</td><td>{{ q.handyman.user.get_full_name }}</td><td>{{ q.amount|money }}</td><td>{% status_badge q.status q.get_status_display %}{% if q.auto_released %} <span class="badge text-bg-light border">auto</span>{% endif %}</td><td>{% if q.reviewed_by %}{{ q.reviewed_by }}{% endif %}</td></tr>
+        {% empty %}<tr><td class="text-secondary">None.</td></tr>{% endfor %}
+      </table>
+    </div></div>
+
+    {% if parts %}
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Parts</h2>
+      <table class="table table-sm small mb-0">
+        {% for p in parts %}<tr><td>{{ p.name }}</td><td>{{ p.price|money }}</td><td>{% status_badge p.homeowner_decision p.get_homeowner_decision_display %}</td><td>{% if p.flagged %}<a href="{% url 'adminpanel:part_detail' p.pk %}">{% status_badge p.review_status p.get_review_status_display %}</a>{% endif %}</td></tr>{% endfor %}
+      </table>
+    </div></div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Recommendations (rule-based score)</h2>
+      <table class="table table-sm small mb-0">
+        {% for r in recommendations %}<tr><td>{{ r.rank }}</td><td>{{ r.handyman.user.get_full_name }}</td><td>{{ r.score }}</td><td>{{ r.get_status_display }}</td><td>{{ r.decline_reason }}</td></tr>
+        {% empty %}<tr><td class="text-secondary">None.</td></tr>{% endfor %}
+      </table>
+    </div></div>
+  </div>
+
+  <div class="col-xl-5">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body small">
+      <h2 class="h6 fw-semibold">Details</h2>
+      <dl class="row mb-0">
+        <dt class="col-5">Homeowner</dt><dd class="col-7"><a href="{% url 'adminpanel:homeowner_detail' job.homeowner.pk %}">{{ job.homeowner.get_full_name }}</a></dd>
+        <dt class="col-5">Handyman</dt><dd class="col-7">{% if job.handyman %}<a href="{% url 'adminpanel:handyman_detail' job.handyman.pk %}">{{ job.handyman.user.get_full_name }}</a>{% else %}–{% endif %}</dd>
+        <dt class="col-5">Address</dt><dd class="col-7">{{ job.address }} ({{ job.planning_region|default:job.address.planning_region }})</dd>
+        <dt class="col-5">Predicted range</dt><dd class="col-7">{{ job.price_p10|whole_money }} / {{ job.price_p50|whole_money }} / {{ job.price_p90|whole_money }}<div class="text-secondary">P10 / P50 / P90 · {{ job.model_version }}</div></dd>
+        <dt class="col-5">Description</dt><dd class="col-7">{{ job.description }}</dd>
+      </dl>
+      {% if photos %}<div class="d-flex flex-wrap gap-2 mt-2">{% for p in photos %}<a href="{{ p.image.url }}" target="_blank"><img class="photo-thumb" src="{{ p.image.url }}" alt="{{ p.get_kind_display }}"></a>{% endfor %}</div>{% endif %}
+    </div></div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Timeline</h2>
+      <ul class="timeline small mb-0">
+        {% for e in events %}<li><strong>{{ e.get_status_display }}</strong> <span class="text-secondary">{{ e.created_at|date:"j M, g:i A" }}{% if e.actor %} · {{ e.actor }}{% endif %}</span>{% if e.note %}<div class="text-secondary">{{ e.note }}</div>{% endif %}</li>{% endfor %}
+      </ul>
+    </div></div>
+
+    {% if job.status not in 'COMPLETED CANCELLED DECLINED' %}
+    <div class="card border-0 shadow-sm border-danger"><div class="card-body">
+      <h2 class="h6 fw-semibold text-danger">Cancel with full refund</h2>
+      <p class="small text-secondary">For exceptional cases only. The homeowner and handyman are notified.</p>
+      <form method="post">{% csrf_token %}
+        {% include 'partials/form_fields.html' with form=form %}
+        <button class="btn btn-outline-danger btn-sm">Cancel job</button></form>
+    </div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

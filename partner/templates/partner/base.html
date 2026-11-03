@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load fixitfast %}
+{% block title %}FixItFast Partners{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark" style="background:#134e4a">
+  <div class="container">
+    <a class="navbar-brand brand" href="{% url 'partner:home' %}">FixIt<span class="accent">Fast</span> <small class="fw-normal opacity-75">Partners</small></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#partnerNav"
+            aria-controls="partnerNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="partnerNav">
+      {% if user.is_authenticated and user.role == 'HANDYMAN' %}
+        {% with url_name=request.resolver_match.url_name %}
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link {% if url_name == 'home' %}active{% endif %}" href="{% url 'partner:home' %}">Dashboard</a></li>
+          {% if user.handyman.application_status == 'APPROVED' %}
+            <li class="nav-item"><a class="nav-link {% if url_name == 'jobs' or url_name == 'job_detail' %}active{% endif %}" href="{% url 'partner:jobs' %}">My jobs</a></li>
+            <li class="nav-item"><a class="nav-link {% if url_name == 'availability' %}active{% endif %}" href="{% url 'partner:availability' %}">Availability</a></li>
+            <li class="nav-item"><a class="nav-link {% if url_name == 'profile' %}active{% endif %}" href="{% url 'partner:profile' %}">Profile</a></li>
+            {% if user.handyman.tier == 'GOLD' %}
+              <li class="nav-item"><a class="nav-link {% if url_name == 'training' or url_name == 'quiz' %}active{% endif %}" href="{% url 'partner:training' %}">Platinum training</a></li>
+            {% endif %}
+          {% endif %}
+        </ul>
+        {% endwith %}
+        <div class="d-flex align-items-center gap-3">
+          <a class="text-white" href="{% url 'partner:notifications' %}" aria-label="Notifications"><i class="bi bi-bell"></i>
+            {% if unread_notifications %}<span class="badge rounded-pill bg-danger">{{ unread_notifications }}</span>{% endif %}</a>
+          {% tier_badge user.handyman.tier %}
+          <form method="post" action="{% url 'partner:logout' %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-light btn-sm" type="submit">Sign out</button>
+          </form>
+        </div>
+      {% else %}
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'partner:apply' %}">Become a partner</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'storefront:home' %}">Homeowner site</a></li>
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+{% endblock %}

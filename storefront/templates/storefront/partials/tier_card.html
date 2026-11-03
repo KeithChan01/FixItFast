@@ -1,0 +1,13 @@
+{# One tier's requirements and homeowner benefits (Table 1). Expects tier, label, info. #}
+{% load fixitfast %}
+<div class="d-flex align-items-center gap-2 mb-3">
+  <i class="bi {{ info.icon }} fs-3 text-primary"></i>
+  <h3 class="h5 mb-0">{{ label }}</h3>
+  {% tier_badge tier %}
+</div>
+<dl class="small mb-0">
+  <dt>Handyman requirements</dt><dd>{{ info.requirements }}</dd>
+  <dt>Job types</dt><dd>{{ info.job_types }}</dd>
+  <dt>Workmanship warranty</dt><dd>{{ info.warranty_days }} days</dd>
+  <dt>Warranty remedy</dt><dd class="mb-0">{{ info.remedy }}</dd>
+</dl>

@@ -1,0 +1,42 @@
+{% extends 'storefront/base.html' %}
+{% block title %}Confirm and rate · FixItFast{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">
+      <h1 class="h4">{% if job.confirmed_at %}Rate{% else %}Is the job done?{% endif %}</h1>
+      <p class="text-secondary">#{{ job.pk }} · {{ job.job_type }} by {{ job.handyman.user.get_full_name }}</p>
+      {% if photos %}
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          {% for photo in photos %}<figure class="mb-0 text-center"><img class="photo-thumb" src="{{ photo.image.url }}" alt=""><figcaption class="small text-secondary">{{ photo.get_kind_display }}</figcaption></figure>{% endfor %}
+        </div>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <fieldset class="mb-3">
+          <legend class="form-label fs-6">Your rating</legend>
+          <div class="d-flex flex-wrap gap-3">
+            {% for radio in rating_form.rating %}<div class="form-check">{{ radio.tag }} <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label></div>{% endfor %}
+          </div>
+          {% for error in rating_form.rating.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </fieldset>
+        <div class="mb-3"><label class="form-label" for="{{ rating_form.comment.id_for_label }}">Comment (optional)</label>{{ rating_form.comment }}</div>
+        <button class="btn btn-primary" name="rate" type="submit">{% if job.confirmed_at %}Submit rating{% else %}Confirm completion and rate{% endif %}</button>
+      </form>
+      {% if not job.confirmed_at %}<p class="small text-secondary mt-3 mb-0">Confirming releases payment to the handyman and starts your warranty. Jobs are confirmed automatically after 48 hours.</p>{% endif %}
+    </div></div>
+
+    {% if not job.confirmed_at and not job.problem_note %}
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+      <h2 class="h6">Something not right?</h2>
+      <form method="post">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=problem_form %}
+        <button class="btn btn-outline-danger" name="problem" type="submit">Report a problem</button>
+      </form>
+    </div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

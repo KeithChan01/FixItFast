@@ -1,0 +1,24 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<h1 class="h4 mb-1">Flagged parts</h1>
+<p class="text-secondary small">Parts that took the job total above the model's 90th percentile. The homeowner has already approved them; this check only affects the handyman's payout.</p>
+<div class="card border-0 shadow-sm table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Job</th><th>Part</th><th>Price</th><th>P90</th><th>Added</th><th></th></tr></thead>
+    <tbody>
+      {% for part in parts %}
+        <tr>
+          <td>#{{ part.job.pk }} · {{ part.job.job_type }}<div class="small text-secondary">{{ part.job.handyman.user.get_full_name }}</div></td>
+          <td>{{ part.name }}</td>
+          <td>{{ part.price|money }}</td>
+          <td>{{ part.job.price_p90|whole_money }}</td>
+          <td class="small">{{ part.created_at|date:"j M, g:i A" }}</td>
+          <td><a class="btn btn-sm btn-primary" href="{% url 'adminpanel:part_detail' part.pk %}">Check receipt</a></td>
+        </tr>
+      {% empty %}<tr><td colspan="6" class="text-secondary">No flagged parts.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

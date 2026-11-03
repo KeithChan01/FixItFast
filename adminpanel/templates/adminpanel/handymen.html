@@ -1,0 +1,31 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<h1 class="h4 mb-3">Handymen</h1>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-sm-6"><input name="q" value="{{ q }}" placeholder="Search name, email or mobile" class="form-control"></div>
+  <div class="col-sm-3"><select name="tier" class="form-select"><option value="">All tiers</option>{% for value, label in tiers %}<option value="{{ value }}" {% if tier == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-sm-3"><button class="btn btn-outline-primary w-100">Search</button></div>
+</form>
+<div class="card border-0 shadow-sm table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Handyman</th><th>Tier</th><th>Rating</th><th>Completed</th><th>Flags</th></tr></thead>
+    <tbody>
+      {% for r in records %}
+        <tr>
+          <td><a href="{% url 'adminpanel:handyman_detail' r.handyman.pk %}">{{ r.handyman.user.get_full_name }}</a><div class="small text-secondary">{{ r.handyman.user.email }}</div></td>
+          <td>{% tier_badge r.handyman.tier %}</td>
+          <td>{{ r.rating|default:"–" }}</td>
+          <td>{{ r.completed }}</td>
+          <td>
+            {% if r.upgrade %}<span class="badge text-bg-success">Eligible for upgrade</span>{% endif %}
+            {% if r.below_tier %}<span class="badge text-bg-warning">Below tier requirements</span>{% endif %}
+            {% if r.handyman.is_suspended %}<span class="badge text-bg-danger">Suspended</span>{% endif %}
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-secondary">No handymen found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

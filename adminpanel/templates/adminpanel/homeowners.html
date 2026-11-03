@@ -1,0 +1,26 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block content %}
+<h1 class="h4 mb-3">Homeowners</h1>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-sm-9"><input name="q" value="{{ q }}" placeholder="Search name, email or mobile" class="form-control"></div>
+  <div class="col-sm-3"><button class="btn btn-outline-primary w-100">Search</button></div>
+</form>
+<div class="card border-0 shadow-sm table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Jobs</th><th>Joined</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for h in homeowners %}
+        <tr>
+          <td><a href="{% url 'adminpanel:homeowner_detail' h.pk %}">{{ h.get_full_name|default:h.email }}</a></td>
+          <td class="small">{{ h.email }}</td>
+          <td class="small">{{ h.mobile }}</td>
+          <td>{{ h.n_jobs }}</td>
+          <td class="small">{{ h.date_joined|date:"j M Y" }}</td>
+          <td>{% if h.is_deactivated %}<span class="badge text-bg-danger">Deactivated</span>{% else %}<span class="badge text-bg-success">Active</span>{% endif %}</td>
+        </tr>
+      {% empty %}<tr><td colspan="6" class="text-secondary">No homeowners found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

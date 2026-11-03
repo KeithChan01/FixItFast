@@ -1,0 +1,33 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}Approve part · FixItFast{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+      <h1 class="h4">Your handyman needs a part</h1>
+      <p class="text-secondary">Job #{{ job.pk }} · {{ job.job_type }}</p>
+      <div class="row g-3 align-items-center mb-3">
+        <div class="col-sm-4"><a href="{{ part.receipt.url }}" target="_blank"><img class="img-fluid rounded border" src="{{ part.receipt.url }}" alt="Receipt"></a></div>
+        <div class="col-sm-8">
+          <table class="table table-sm mb-0">
+            <tr><td>Part</td><td class="text-end fw-semibold">{{ part.name }}</td></tr>
+            <tr><td>Part price</td><td class="text-end">{{ part.price|money }}</td></tr>
+            <tr><td>Current repair total</td><td class="text-end">{{ current_total|money }}</td></tr>
+            <tr class="fw-semibold"><td>Revised total</td><td class="text-end">{{ revised_total|money }}</td></tr>
+          </table>
+        </div>
+      </div>
+      <form method="post" class="d-grid gap-2">
+        {% csrf_token %}
+        <button class="btn btn-primary" name="action" value="approve">Approve and pay {{ part.price|money }}</button>
+        <button class="btn btn-outline-danger" name="action" value="decline">Decline the repair</button>
+      </form>
+      <p class="small text-secondary mt-3 mb-0">
+        Declining ends the job. Your quotation and service fee are refunded and a {{ consultation_fee|money }} consultation fee is charged.
+      </p>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

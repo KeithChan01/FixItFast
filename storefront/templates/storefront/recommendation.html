@@ -1,0 +1,68 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}Your recommended handyman · FixItFast{% endblock %}
+
+{% block content %}
+{% include 'storefront/partials/booking_steps.html' with step=4 %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <p class="small text-secondary mb-2">We recommend</p>
+        <div class="d-flex align-items-center gap-3 mb-3">
+          {% if handyman.photo %}<img class="avatar" src="{{ handyman.photo.url }}" alt="">{% else %}<div class="avatar d-flex align-items-center justify-content-center"><i class="bi bi-person fs-2 text-secondary"></i></div>{% endif %}
+          <div>
+            <h1 class="h4 mb-1">{{ handyman.user.get_full_name }}</h1>
+            {% tier_badge handyman.tier %}
+            <span class="ms-2 small">
+              <i class="bi bi-star-fill text-warning"></i> {% if rating %}{{ rating }}{% else %}New{% endif %}
+              &middot; {{ completed }} completed job{{ completed|pluralize }}
+              &middot; {{ handyman.years_experience }} yrs experience
+            </span>
+          </div>
+        </div>
+        {% if handyman.bio %}<p>{{ handyman.bio }}</p>{% endif %}
+        {% if certificates %}
+          <h2 class="h6">Verified qualifications</h2>
+          <ul class="small">{% for doc in certificates %}<li>{{ doc.get_doc_type_display }}: {{ doc.title }}</li>{% endfor %}</ul>
+        {% endif %}
+        <h2 class="h6">Recent reviews</h2>
+        {% for review in reviews %}
+          <div class="border-start border-3 ps-2 mb-2 small">
+            {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="bi bi-star-fill text-warning"></i>{% else %}<i class="bi bi-star text-warning"></i>{% endif %}{% endfor %}
+            <span class="text-secondary">{{ review.job.job_type }}</span>
+            {% if review.comment %}<div>{{ review.comment }}</div>{% endif %}
+          </div>
+        {% empty %}
+          <p class="small text-secondary">No reviews yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="h6 fw-semibold">Your booking</h2>
+        <dl class="small">
+          <dt>Repair</dt><dd>{{ job.job_type }}</dd>
+          <dt>When</dt><dd>{{ job.slot_start|date:"D j M, g:i A" }} – {{ job.slot_end|time:"g:i A" }} ({{ job.timing_band }})</dd>
+          <dt>Predicted range</dt><dd class="fs-5 fw-semibold">{{ job.price_p10|whole_money }} – {{ job.price_p90|whole_money }}</dd>
+        </dl>
+        <div class="alert alert-light border small">
+          <i class="bi bi-info-circle"></i> If you decline the repair after the visit has started, a
+          <strong>S$25 consultation fee</strong> applies. Cancelling before the visit is refunded in full.
+        </div>
+        <form method="post" class="d-grid gap-2">
+          {% csrf_token %}
+          <button class="btn btn-primary" name="action" value="accept">Accept and request a quotation</button>
+          <button class="btn btn-outline-secondary" name="action" value="decline">Show me another handyman</button>
+        </form>
+        <p class="small text-secondary mt-3 mb-0">
+          <a href="{% url 'storefront:cancel_job' job.pk %}" class="link-secondary">Cancel this request</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

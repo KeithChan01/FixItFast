@@ -1,0 +1,30 @@
+{
+  "_note": "Job types used to generate training data. Keep in sync with the service catalogue (A03): a job type the model was not trained on must stay inactive.",
+  "tiers": ["Standard", "Gold", "Platinum"],
+  "timing_bands": ["Off-peak", "Peak"],
+  "planning_regions": ["Central", "East", "North", "North-East", "West"],
+  "job_types": [
+    {"category": "Plumbing", "name": "Tap replacement", "min_tier": "Standard", "licence_required": false, "base_price": 70},
+    {"category": "Plumbing", "name": "Sink and basin leak repair", "min_tier": "Standard", "licence_required": false, "base_price": 80},
+    {"category": "Plumbing", "name": "Choked toilet clearing", "min_tier": "Standard", "licence_required": false, "base_price": 90},
+    {"category": "Plumbing", "name": "Concealed pipe leak repair", "min_tier": "Platinum", "licence_required": false, "base_price": 280},
+    {"category": "Plumbing", "name": "Water heater replacement", "min_tier": "Platinum", "licence_required": false, "base_price": 250},
+
+    {"category": "Electrical", "name": "Light fixture replacement", "min_tier": "Gold", "licence_required": true, "base_price": 80},
+    {"category": "Electrical", "name": "Power point installation", "min_tier": "Gold", "licence_required": true, "base_price": 110},
+    {"category": "Electrical", "name": "Ceiling fan installation", "min_tier": "Gold", "licence_required": true, "base_price": 130},
+    {"category": "Electrical", "name": "Circuit breaker troubleshooting", "min_tier": "Platinum", "licence_required": true, "base_price": 180},
+
+    {"category": "Appliance Repair", "name": "Cooker hood repair", "min_tier": "Standard", "licence_required": false, "base_price": 90},
+    {"category": "Appliance Repair", "name": "Washing machine repair", "min_tier": "Gold", "licence_required": false, "base_price": 110},
+    {"category": "Appliance Repair", "name": "Refrigerator repair", "min_tier": "Gold", "licence_required": false, "base_price": 130},
+
+    {"category": "Furniture Assembly", "name": "Furniture assembly", "min_tier": "Standard", "licence_required": false, "base_price": 60},
+    {"category": "Furniture Assembly", "name": "Bed frame assembly", "min_tier": "Standard", "licence_required": false, "base_price": 80},
+    {"category": "Furniture Assembly", "name": "Wardrobe assembly", "min_tier": "Standard", "licence_required": false, "base_price": 110},
+
+    {"category": "Minor Installation", "name": "Curtain rail installation", "min_tier": "Standard", "licence_required": false, "base_price": 70},
+    {"category": "Minor Installation", "name": "Wall shelf mounting", "min_tier": "Standard", "licence_required": false, "base_price": 60},
+    {"category": "Minor Installation", "name": "TV wall mounting", "min_tier": "Gold", "licence_required": false, "base_price": 100}
+  ]
+}

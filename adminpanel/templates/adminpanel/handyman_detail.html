@@ -1,0 +1,92 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<a class="small" href="{% url 'adminpanel:handymen' %}">&larr; Handymen</a>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-1">{{ handyman.user.get_full_name }} {% tier_badge handyman.tier %}</h1>
+    <div class="small text-secondary">{{ handyman.user.email }} · {{ handyman.user.mobile }} · rating {{ rating|default:"–" }} · {{ completed }} completed jobs</div>
+    {% if handyman.is_suspended %}<div class="badge text-bg-danger mt-1">Suspended: {{ handyman.suspension_reason }}</div>{% endif %}
+  </div>
+</div>
+
+{% if below_tier %}<div class="alert alert-warning">This handyman no longer meets every requirement for {{ handyman.get_tier_display }}. Consider moving them down a tier.</div>{% endif %}
+
+<div class="row g-4">
+  <div class="col-xl-6">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Tier eligibility</h2>
+      {% for label, items in requirements %}
+        <div class="fw-semibold small mt-2">{{ label }}</div>
+        <ul class="list-unstyled small mb-0">
+          {% for text, ok in items %}<li>{% if ok %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %} {{ text }}</li>{% endfor %}
+        </ul>
+      {% endfor %}
+      <hr>
+      <form method="post" action="{% url 'adminpanel:handyman_action' handyman.pk %}" class="mb-3">
+        {% csrf_token %}
+        <button class="btn btn-sm {% if upgrade_label %}btn-success{% else %}btn-outline-secondary{% endif %}" name="action" value="upgrade" {% if not upgrade_label %}disabled{% endif %}>
+          {% if upgrade_label %}Confirm upgrade to {{ upgrade_label }}{% else %}Not eligible for the next tier{% endif %}</button>
+      </form>
+      {% if downgrade_form %}
+        <details>
+          <summary class="small">Move down a tier</summary>
+          <form method="post" action="{% url 'adminpanel:handyman_action' handyman.pk %}" class="mt-2">
+            {% csrf_token %}
+            {% include 'partials/form_fields.html' with form=downgrade_form %}
+            <button class="btn btn-outline-warning btn-sm" name="action" value="downgrade">Change tier</button>
+          </form>
+        </details>
+      {% endif %}
+    </div></div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Suspension</h2>
+      <form method="post" action="{% url 'adminpanel:handyman_action' handyman.pk %}">
+        {% csrf_token %}
+        {% if handyman.is_suspended %}
+          <button class="btn btn-outline-success btn-sm" name="action" value="unsuspend">Lift suspension</button>
+        {% else %}
+          {% include 'partials/form_fields.html' with form=reason_form %}
+          <button class="btn btn-outline-danger btn-sm" name="action" value="suspend">Suspend handyman</button>
+        {% endif %}
+      </form>
+    </div></div>
+
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Tier history</h2>
+      <ul class="small list-unstyled mb-0">
+        {% for c in tier_changes %}<li class="border-bottom py-1">{{ c.created_at|date:"j M Y" }}: {{ c.get_from_tier_display }} → {{ c.get_to_tier_display }} by {{ c.changed_by }} – {{ c.reason }}</li>
+        {% empty %}<li class="text-secondary">No tier changes.</li>{% endfor %}
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Profile</h2>
+      <p class="small mb-1">{{ handyman.bio|default:"No bio." }}</p>
+      <p class="small mb-0">Job types: {% for jt in handyman.job_types.all %}{{ jt.name }}{% if not forloop.last %}, {% endif %}{% empty %}none{% endfor %}</p>
+    </div></div>
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <div class="d-flex justify-content-between"><h2 class="h6 fw-semibold">Documents</h2><a class="small" href="{% url 'adminpanel:application_detail' handyman.pk %}">Review documents</a></div>
+      {% include 'partner/partials/documents_table.html' %}
+    </div></div>
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h2 class="h6 fw-semibold">Recent ratings</h2>
+      <table class="table table-sm small mb-0">
+        {% for r in reviews %}<tr><td>{{ r.created_at|date:"j M Y" }}</td><td>{{ r.job.job_type }}</td><td>{{ r.rating }}★</td><td>{{ r.comment }}</td></tr>
+        {% empty %}<tr><td class="text-secondary">No ratings yet.</td></tr>{% endfor %}
+      </table>
+    </div></div>
+    <div class="card border-0 shadow-sm"><div class="card-body">
+      <h2 class="h6 fw-semibold">Recent jobs</h2>
+      <table class="table table-sm small mb-0">
+        {% for job in jobs %}<tr><td><a href="{% url 'adminpanel:job_detail' job.pk %}">#{{ job.pk }}</a></td><td>{{ job.job_type }}</td><td>{{ job.slot_start|date:"j M Y" }}</td><td>{% status_badge job.status job.get_status_display %}</td></tr>
+        {% empty %}<tr><td class="text-secondary">No jobs yet.</td></tr>{% endfor %}
+      </table>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

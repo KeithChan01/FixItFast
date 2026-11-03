@@ -1,0 +1,40 @@
+{% extends 'storefront/base.html' %}
+{% load fixitfast %}
+{% block title %}Your quotation · FixItFast{% endblock %}
+
+{% block content %}
+{% include 'storefront/partials/booking_steps.html' with step=5 %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4">Quotation from {{ quote.handyman.user.get_full_name }}</h1>
+        <p class="text-secondary small">{{ job.job_type }} &middot; {{ job.slot_start|date:"D j M, g:i A" }} &middot; {% tier_badge job.tier %}</p>
+
+        <h2 class="h6">Work to be done</h2>
+        <p>{{ quote.work_description|linebreaksbr }}</p>
+        <p class="small text-secondary">Predicted range for this tier and slot: {{ job.price_p10|whole_money }} – {{ job.price_p90|whole_money }}</p>
+
+        <table class="table mb-4">
+          <tr><td>Repair quotation</td><td class="text-end">{{ quote.amount|money }}</td></tr>
+          <tr>
+            <td>Platform service fee</td>
+            <td class="text-end">{% if waived %}<s class="text-secondary">{{ full_fee|money }}</s> <span class="badge text-bg-success">Free on your first job</span>{% else %}{{ fee|money }}{% endif %}</td>
+          </tr>
+          <tr class="fw-semibold"><td>Total to pay now</td><td class="text-end">{{ total|money }}</td></tr>
+        </table>
+
+        <div class="alert alert-light border small">
+          <i class="bi bi-shield-lock"></i> FixItFast holds your payment until you confirm the job is done.
+          Declining after the visit starts incurs a S$25 consultation fee. Payment is simulated for this demo.
+        </div>
+        <form method="post" class="d-flex gap-2 flex-wrap">
+          {% csrf_token %}
+          <button class="btn btn-primary" name="action" value="pay">Pay {{ total|money }}</button>
+          <button class="btn btn-outline-secondary" name="action" value="reject">Reject and see next handyman</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

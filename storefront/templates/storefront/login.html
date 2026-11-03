@@ -1,0 +1,7 @@
+{% extends 'storefront/base.html' %}
+{% block title %}Sign in · FixItFast{% endblock %}
+
+{% block content %}
+  {% include 'partials/login_card.html' with heading='Welcome back' subheading='Sign in to book and track your repairs.' %}
+  <p class="text-center small mt-3">New to FixItFast? <a href="{% url 'storefront:register' %}">Create an account</a></p>
+{% endblock %}

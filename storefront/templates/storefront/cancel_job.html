@@ -1,0 +1,20 @@
+{% extends 'storefront/base.html' %}
+{% block title %}Cancel job · FixItFast{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+      <h1 class="h4">Cancel job #{{ job.pk }}?</h1>
+      <p class="text-secondary">{{ job.job_type }}{% if job.slot_start %} on {{ job.slot_start|date:"D j M, g:i A" }}{% endif %}</p>
+      {% if paid %}<div class="alert alert-info small">The visit has not started, so your payment will be refunded in full.</div>{% endif %}
+      <form method="post">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' with form=form %}
+        <button class="btn btn-danger" type="submit">Cancel job</button>
+        <a class="btn btn-link" href="{% url 'storefront:job_detail' job.pk %}">Keep job</a>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

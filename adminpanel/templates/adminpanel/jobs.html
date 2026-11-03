@@ -1,0 +1,28 @@
+{% extends 'adminpanel/base.html' %}
+{% load fixitfast %}
+
+{% block content %}
+<h1 class="h4 mb-3">Jobs and payments</h1>
+<form class="row g-2 mb-3" method="get">
+  {% for field in form %}<div class="col-sm-6 col-lg">{{ field }}</div>{% endfor %}
+  <div class="col-sm-6 col-lg-auto d-flex gap-2"><button class="btn btn-outline-primary">Filter</button><a class="btn btn-link" href="{% url 'adminpanel:jobs' %}">Clear</a></div>
+</form>
+<div class="card border-0 shadow-sm table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Job</th><th>Slot</th><th>Homeowner</th><th>Handyman</th><th>Tier</th><th>Band</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for job in jobs %}
+        <tr>
+          <td><a href="{% url 'adminpanel:job_detail' job.pk %}">#{{ job.pk }} · {{ job.job_type }}</a><div class="small text-secondary">{{ job.job_type.category }}</div></td>
+          <td class="small">{{ job.slot_start|date:"j M Y, g:i A"|default:"–" }}</td>
+          <td class="small">{{ job.homeowner.get_full_name }}</td>
+          <td class="small">{{ job.handyman.user.get_full_name|default:"–" }}</td>
+          <td>{% tier_badge job.tier %}</td>
+          <td class="small">{{ job.timing_band }}</td>
+          <td>{% status_badge job.status job.get_status_display %}{% if job.problem_note %} <i class="bi bi-exclamation-triangle text-danger" title="Problem reported"></i>{% endif %}</td>
+        </tr>
+      {% empty %}<tr><td colspan="7" class="text-secondary">No jobs match.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

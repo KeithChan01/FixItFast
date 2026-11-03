@@ -19,12 +19,13 @@ Each section has its own login page. The default Django admin is not used.
 
 How to run
 ----------
-Requires Python 3.13. From this folder (the one containing manage.py):
+Requires Python 3.13. From this folder (the one containing this readme):
 
     python -m venv .venv
     .venv\Scripts\activate                 (Windows)
     source .venv/bin/activate              (macOS / Linux)
     pip install -r requirements.txt
+    cd fixitfastproj
     python manage.py migrate
     python manage.py seed_demo
     python manage.py runserver
@@ -34,8 +35,9 @@ Then open http://127.0.0.1:8000/.
 seed_demo loads the service catalogue, the Platinum training modules and quiz,
 and the demo accounts below. It is safe to run more than once.
 
-To start again from a clean database, stop the server, delete db.sqlite3 and
-the media/ folder, then run migrate and seed_demo again.
+To start again from a clean database, stop the server, delete
+fixitfastproj/db.sqlite3 and fixitfastproj/media/, then run migrate and
+seed_demo again.
 
 
 Demo accounts
@@ -91,7 +93,7 @@ then used to automate two decisions:
     - A replacement part that takes the job total above the 90th percentile is
       flagged, and its payout is held until an employee checks the receipt.
 
-The model files are included. To regenerate them:
+The model files are included. To regenerate them, from fixitfastproj/:
 
     python ml/generate_data.py
     python ml/train_model.py
@@ -142,9 +144,16 @@ and no payment gateway is used.
 
 Project layout
 --------------
-Business rules live in the services modules, so the views stay short.
+    fixitfast/                 this folder
+        readme.txt
+        requirements.txt
+        fixitfastproj/         the Django project (contains manage.py)
 
-    config/        settings (fees and business rules at the bottom), root URLs
+Inside fixitfastproj/, business rules live in the services modules, so the
+views stay short.
+
+    fixitfastproj/ settings (fees and business rules at the bottom), root URLs,
+                   wsgi.py and asgi.py
     accounts/      User with role, Address, Notification, login and role decorators
     catalogue/     Tier, TimingBand, PlanningRegion, Category, JobType,
                    postal code to region lookup, seed_demo command
@@ -170,6 +179,8 @@ accordions. All pricing and business logic runs on the server.
 
 Tests
 -----
+From fixitfastproj/:
+
     python manage.py test
 
 27 tests across the apps, including end-to-end runs of the job flow through

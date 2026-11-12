@@ -1,6 +1,14 @@
 FixItFast - IS2108 Pair Project
 ================================
+Team Details 
+------------
+Pair Project 43 
+Name               | Student Number | Email                 
+Lee Chin Yi        | A0317708Y      | e1519368@u.nus.edu    
+Keith Chan Xin Kok | A0291974M      | keithchanxk@u.nus.edu                
 
+Project Details 
+---------------
 FixItFast is a B2C home-repair matching platform built with Django. A homeowner
 describes a repair once, chooses a service tier (Standard, Gold or Platinum),
 and picks an appointment slot from a calendar that shows a machine-learning

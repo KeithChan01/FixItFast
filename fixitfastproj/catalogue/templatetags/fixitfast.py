@@ -51,3 +51,12 @@ def tier_badge(tier):
 @register.filter
 def get_item(mapping, key):
     return mapping.get(key)
+
+CATEGORY_ICONS = {
+    'Plumbing': 'bi-droplet', 'Electrical': 'bi-lightning-charge', 'Appliance Repair': 'bi-plug',
+    'Furniture Assembly': 'bi-box-seam', 'Minor Installation': 'bi-wrench-adjustable',
+}
+
+@register.filter
+def category_icon(name):
+    return CATEGORY_ICONS.get(name, 'bi-tools')

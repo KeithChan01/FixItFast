@@ -1,12 +1,48 @@
 {% extends 'storefront/base.html' %}
+{% load static fixitfast %}
 
 {% block content %}
 <section class="hero p-4 p-md-5 mb-5">
-  <h1 class="display-6 fw-semibold">Home repairs, priced before you book.</h1>
-  <p class="lead mb-4">Describe the problem once, choose your handyman tier, and see a price range beside every slot.</p>
-  <a href="{% url 'storefront:job_request' %}" class="btn btn-light btn-lg">Book a repair</a>
-  <a href="{% url 'storefront:tiers' %}" class="btn btn-outline-light btn-lg ms-2">Compare tiers</a>
+  <div class="row align-items-center g-4">
+    <div class="col-lg-7">
+      <h1 class="display-6 fw-bold">Home repairs, priced before you book.</h1>
+      <p class="lead mb-4">Describe the problem once, choose your handyman tier, and see a price range beside every slot.</p>
+      {# A plain GET to the booking page: job_request already reads ?job_type= as the preselected repair. #}
+      <form class="hero-search mb-3" method="get" action="{% url 'storefront:job_request' %}">
+        <label class="visually-hidden" for="hero-job-type">What needs fixing?</label>
+        <select id="hero-job-type" name="job_type">
+          <option value="">What needs fixing?</option>
+          {% for category in categories %}
+            <optgroup label="{{ category.name }}">
+              {% for job_type in category.job_types.all %}{% if job_type.is_active %}<option value="{{ job_type.pk }}">{{ job_type.name }}</option>{% endif %}{% endfor %}
+            </optgroup>
+          {% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit">Book a repair</button>
+      </form>
+      <a class="link-light small" href="{% url 'storefront:tiers' %}">Compare tiers</a>
+    </div>
+    <div class="col-lg-5">
+      <img class="hero-photo" src="{% static 'img/handyman.jpg' %}" width="350" height="233"
+           alt="Handyman doing work" class="rounded-corners" fetchpriority="high">
+    </div>
+  </div>
 </section>
+
+<div class="row g-3 mb-5">
+  <div class="col-md-4"><div class="card h-100 border-0 shadow-sm"><div class="card-body d-flex gap-3">
+    <div class="cat-icon"><i class="bi bi-graph-up"></i></div>
+    <div><h2 class="h6 fw-semibold mb-1">See the price first</h2><p class="small text-secondary mb-0">A range predicted from similar past repairs appears beside every slot.</p></div>
+  </div></div></div>
+  <div class="col-md-4"><div class="card h-100 border-0 shadow-sm"><div class="card-body d-flex gap-3">
+    <div class="cat-icon"><i class="bi bi-shield-lock"></i></div>
+    <div><h2 class="h6 fw-semibold mb-1">Pay safely</h2><p class="small text-secondary mb-0">We hold your payment until the job is done.</p></div>
+  </div></div></div>
+  <div class="col-md-4"><div class="card h-100 border-0 shadow-sm"><div class="card-body d-flex gap-3">
+    <div class="cat-icon"><i class="bi bi-patch-check"></i></div>
+    <div><h2 class="h6 fw-semibold mb-1">Covered after the repair</h2><p class="small text-secondary mb-0">A workmanship warranty of 30 to 180 days, depending on tier.</p></div>
+  </div></div></div>
+</div>
 
 <div class="row g-3 mb-5 text-center">
   <div class="col-md-3"><div class="step-num">1</div><h3 class="h6 mt-2">Describe it once</h3><p class="small text-secondary">Pick the repair, add photos and your address.</p></div>
@@ -21,10 +57,13 @@
     <div class="col-sm-6 col-lg-4">
       <div class="card h-100 border-0 shadow-sm">
         <div class="card-body">
-          <h3 class="h6 fw-semibold">{{ category.name }}</h3>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="cat-icon"><i class="bi {{ category.name|category_icon }}"></i></div>
+            <h3 class="h6 fw-semibold mb-0">{{ category.name }}</h3>
+          </div>
           <ul class="list-unstyled small text-secondary mb-0">
             {% for job_type in category.job_types.all %}
-              {% if job_type.is_active %}<li><a class="link-secondary" href="{% url 'storefront:job_request' %}?job_type={{ job_type.pk }}">{{ job_type.name }}</a></li>{% endif %}
+              {% if job_type.is_active %}<li class="mb-1"><a class="link-secondary" href="{% url 'storefront:job_request' %}?job_type={{ job_type.pk }}">{{ job_type.name }}</a></li>{% endif %}
             {% endfor %}
           </ul>
         </div>

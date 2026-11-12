@@ -8,11 +8,13 @@ from catalogue.models import JobType
 class GroupedJobTypeField(forms.ModelChoiceField):
     """A job type <select> grouped by category, so no JavaScript is needed for two dropdowns."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def build_grouped_choices(self):
         groups = {}
+
         for job_type in self.queryset.select_related('category'):
-            groups.setdefault(job_type.category.name, []).append((job_type.pk, job_type.name))
+            groups.setdefault(job_type.category.name, []).append(
+                (job_type.pk, job_type.name)
+            )
         self.choices = [('', 'Select a repair')] + list(groups.items())
 
 
@@ -20,7 +22,12 @@ class JobRequestForm(forms.Form):
     """H03: describe the problem once, with photos and an address."""
 
     job_type = GroupedJobTypeField(
-        queryset=JobType.objects.filter(is_active=True, category__is_active=True), label='What needs fixing?')
+        queryset=JobType.objects.filter(
+            is_active=True,
+            category__is_active=True,
+        ),
+        label='What needs fixing?',
+    )
     description = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 4, 'placeholder': 'e.g. The kitchen tap drips constantly and the handle is loose.'}),
         min_length=settings.MIN_DESCRIPTION_LENGTH,
@@ -31,7 +38,11 @@ class JobRequestForm(forms.Form):
 
     def __init__(self, *args, homeowner, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['address'].queryset = homeowner.addresses.order_by('-is_default', 'label')
+        self.fields['job_type'].build_grouped_choices()
+        self.fields['address'].queryset = homeowner.addresses.order_by(
+            '-is_default',
+            'label',
+        )
 
 
 class RatingForm(forms.Form):

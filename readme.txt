@@ -1,6 +1,14 @@
 FixItFast - IS2108 Pair Project
 ================================
+Team Details 
+------------
+Pair Project 43 
+Name               | Student Number | Email                 
+Lee Chin Yi        | A0317708Y      | e1519368@u.nus.edu    
+Keith Chan Xin Kok | A0291974M      | keithchanxk@u.nus.edu                
 
+Project Details 
+---------------
 FixItFast is a B2C home-repair matching platform built with Django. A homeowner
 describes a repair once, chooses a service tier (Standard, Gold or Platinum),
 and picks an appointment slot from a calendar that shows a machine-learning
@@ -44,12 +52,15 @@ Demo accounts
 -------------
 Password for every account: fixitfast-demo
 
-    Admin panel   manager@fixitfast.test     Manager (also sees monthly revenue)
-                  employee@fixitfast.test    Employee
-    Storefront    homeowner@fixitfast.test   Homeowner with an address in Tampines (East)
-    Partner       standard@fixitfast.test    Standard handyman
-                  gold@fixitfast.test        Gold handyman
-                  platinum@fixitfast.test    Platinum handyman
+
+    Admin panel  http://127.0.0.1:8000/staff/login/   manager@fixitfast.test     Manager (also sees monthly revenue)
+                                                      employee@fixitfast.test    Employee
+
+    Storefront   http://127.0.0.1:8000/login/         homeowner@fixitfast.test   Homeowner with an address in Tampines (East)
+
+    Partner      http://127.0.0.1:8000/partner/login/ standard@fixitfast.test    Standard handyman
+                                                      gold@fixitfast.test        Gold handyman
+                                                      platinum@fixitfast.test    Platinum handyman
 
 Sign in with the email address. New homeowners can register at /register/ and
 new handymen can apply at /partner/apply/.
@@ -111,7 +122,7 @@ Admin panel (adminpanel/views.py; A01 login and roles in accounts/)
     A04 Verify handyman applications
     A05 Handyman records and tiers
     A06 Review out-of-range quotations          [ML]
-    A07 Review flagged part lines                [ML]
+    A07 Review flagged part lines               [ML]
     A08 Warranty claims
     A09 Homeowner records
     A10 Jobs and payment records

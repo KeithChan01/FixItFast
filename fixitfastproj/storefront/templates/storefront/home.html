@@ -24,7 +24,7 @@
     </div>
     <div class="col-lg-5">
       <img class="hero-photo" src="{% static 'img/handyman.jpg' %}" width="350" height="233"
-           alt="Handyman doing work" class="rounded-corners" fetchpriority="high">
+           alt="Handyman doing work" fetchpriority="high">
     </div>
   </div>
 </section>
@@ -44,12 +44,39 @@
   </div></div></div>
 </div>
 
-<div class="row g-3 mb-5 text-center">
-  <div class="col-md-3"><div class="step-num">1</div><h3 class="h6 mt-2">Describe it once</h3><p class="small text-secondary">Pick the repair, add photos and your address.</p></div>
-  <div class="col-md-3"><div class="step-num">2</div><h3 class="h6 mt-2">Choose a tier</h3><p class="small text-secondary">Standard, Gold or Platinum, each with its own warranty.</p></div>
-  <div class="col-md-3"><div class="step-num">3</div><h3 class="h6 mt-2">Compare slot prices</h3><p class="small text-secondary">Every slot shows a price range predicted from past jobs.</p></div>
-  <div class="col-md-3"><div class="step-num">4</div><h3 class="h6 mt-2">Pay safely</h3><p class="small text-secondary">We hold your payment until the job is done.</p></div>
-</div>
+<section class="how-it-works mb-5" aria-labelledby="how-heading">
+  <div class="text-center mb-4">
+    <span class="eyebrow">How it works</span>
+    <h2 id="how-heading" class="h3 mt-1 mb-0">From problem to fixed in four steps</h2>
+  </div>
+  <div class="steps-panel">
+  <ol class="steps">
+    <li class="step">
+      <div class="step-icon"><i class="bi bi-camera" aria-hidden="true"></i><span class="step-badge">1</span></div>
+      <h3 class="h6 fw-semibold mb-1">Describe it once</h3>
+      <p class="small text-secondary mb-0">Pick the repair, add photos and your address.</p>
+    </li>
+    <li class="step">
+      <div class="step-icon"><i class="bi bi-award" aria-hidden="true"></i><span class="step-badge">2</span></div>
+      <h3 class="h6 fw-semibold mb-1">Choose a tier</h3>
+      <p class="small text-secondary mb-0">Standard, Gold or Platinum, each with its own warranty.</p>
+    </li>
+    <li class="step step-featured">
+      <div class="step-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i><span class="step-badge">3</span></div>
+      <h3 class="h6 fw-semibold mb-1">Compare slot prices</h3>
+      <p class="small text-secondary mb-2">Every slot shows a price range predicted from past jobs.</p>
+      <span class="step-tag"><i class="bi bi-stars" aria-hidden="true"></i> Machine-learning estimate</span>
+    </li>
+    <li class="step">
+      <div class="step-icon"><i class="bi bi-shield-check" aria-hidden="true"></i><span class="step-badge">4</span></div>
+      <h3 class="h6 fw-semibold mb-1">Pay safely</h3>
+      <p class="small text-secondary mb-0">We hold your payment until the job is done.</p>
+    </li>
+  </ol>
+  {# Fills the empty half of the panel while the steps are stacked (tablet widths). #}
+  <img class="steps-art" src="{% static 'img/how-it-works.svg' %}" width="320" height="300" alt="" loading="lazy">
+  </div>
+</section>
 
 <h2 class="h4 mb-3">What we fix</h2>
 <div class="row g-3">

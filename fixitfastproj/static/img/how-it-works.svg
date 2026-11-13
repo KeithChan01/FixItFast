@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300" role="img" aria-labelledby="t">
+  <title id="t">A phone showing appointment slots with predicted price ranges, beside a toolbox and a warranty shield</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e6f2f3"/>
+      <stop offset="1" stop-color="#d3ebe9"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#0f2a43" flood-opacity=".16"/>
+    </filter>
+  </defs>
+
+  <!-- Soft backdrop -->
+  <path d="M42 70C70 18 158 6 222 30s92 92 74 150-80 104-150 100S20 236 14 176 14 122 42 70Z" fill="url(#bg)"/>
+  <circle cx="276" cy="58" r="5" fill="#5eead4"/>
+  <circle cx="34" cy="226" r="4" fill="#f59e0b" opacity=".7"/>
+  <path d="M60 46l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#5eead4"/>
+  <path d="M268 236l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#0f766e" opacity=".5"/>
+
+  <!-- Phone -->
+  <g filter="url(#shadow)">
+    <rect x="104" y="34" width="124" height="232" rx="20" fill="#0f2a43"/>
+    <rect x="112" y="44" width="108" height="212" rx="13" fill="#fff"/>
+  </g>
+  <rect x="148" y="38" width="36" height="5" rx="2.5" fill="#1e3a5f"/>
+  <rect x="112" y="44" width="108" height="34" rx="13" fill="#0f766e"/>
+  <rect x="112" y="64" width="108" height="14" fill="#0f766e"/>
+  <rect x="122" y="54" width="44" height="6" rx="3" fill="#fff" opacity=".9"/>
+  <rect x="122" y="65" width="28" height="5" rx="2.5" fill="#5eead4"/>
+
+  <!-- Slot rows: teal = off-peak, amber = peak -->
+  <g font-family="Figtree, Segoe UI, Arial, sans-serif" font-weight="700">
+    <rect x="120" y="88" width="92" height="30" rx="7" fill="#f5f8fa"/>
+    <rect x="120" y="88" width="4" height="30" rx="2" fill="#0f766e"/>
+    <rect x="130" y="95" width="26" height="5" rx="2.5" fill="#9fb2c1"/>
+    <text x="130" y="112" font-size="9" fill="#0f2a43">S$75–105</text>
+
+    <rect x="120" y="124" width="92" height="30" rx="7" fill="#e6f2f3" stroke="#0f766e" stroke-width="1.5"/>
+    <rect x="120" y="124" width="4" height="30" rx="2" fill="#0f766e"/>
+    <rect x="130" y="131" width="26" height="5" rx="2.5" fill="#9fb2c1"/>
+    <text x="130" y="148" font-size="9" fill="#0f2a43">S$75–105</text>
+    <circle cx="200" cy="139" r="7" fill="#0f766e"/>
+    <path d="M196.5 139l2.5 2.5 4.5-5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <rect x="120" y="160" width="92" height="30" rx="7" fill="#f5f8fa"/>
+    <rect x="120" y="160" width="4" height="30" rx="2" fill="#f59e0b"/>
+    <rect x="130" y="167" width="26" height="5" rx="2.5" fill="#9fb2c1"/>
+    <text x="130" y="184" font-size="9" fill="#0f2a43">S$90–145</text>
+
+    <rect x="120" y="196" width="92" height="30" rx="7" fill="#f5f8fa"/>
+    <rect x="120" y="196" width="4" height="30" rx="2" fill="#f59e0b"/>
+    <rect x="130" y="203" width="26" height="5" rx="2.5" fill="#9fb2c1"/>
+    <text x="130" y="220" font-size="9" fill="#0f2a43">S$90–145</text>
+  </g>
+  <rect x="120" y="234" width="92" height="14" rx="7" fill="#0f766e"/>
+  <rect x="148" y="239" width="36" height="4" rx="2" fill="#fff"/>
+
+  <!-- Price-trend card floating left -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="92" width="86" height="58" rx="12" fill="#fff"/>
+  </g>
+  <rect x="40" y="102" width="34" height="5" rx="2.5" fill="#9fb2c1"/>
+  <polyline points="42,138 56,128 68,132 82,118 104,112" fill="none" stroke="#0f766e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="104" cy="112" r="4" fill="#5eead4" stroke="#0f766e" stroke-width="2"/>
+
+  <!-- Warranty shield floating right -->
+  <g filter="url(#shadow)">
+    <circle cx="258" cy="112" r="30" fill="#fff"/>
+  </g>
+  <path d="M258 92l18 7v11c0 12-8 20-18 24-10-4-18-12-18-24V99z" fill="#0f2a43"/>
+  <path d="M250 112l6 6 11-12" stroke="#5eead4" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Toolbox and wrench -->
+  <g filter="url(#shadow)">
+    <rect x="216" y="196" width="76" height="52" rx="9" fill="#f59e0b"/>
+  </g>
+  <path d="M238 196v-9a5 5 0 0 1 5-5h22a5 5 0 0 1 5 5v9" fill="none" stroke="#b45309" stroke-width="5"/>
+  <rect x="216" y="212" width="76" height="6" fill="#b45309" opacity=".55"/>
+  <rect x="248" y="207" width="12" height="16" rx="3" fill="#0f2a43"/>
+  <g transform="rotate(-38 70 222)">
+    <rect x="44" y="216" width="56" height="11" rx="5.5" fill="#64748b"/>
+    <path d="M100 221.5a13 13 0 1 0 20-11l-7 7-6-1-1-6 7-7a13 13 0 0 0-13 18z" fill="#64748b"/>
+  </g>
+</svg>
